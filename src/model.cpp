@@ -8,7 +8,7 @@
 #include <thread>
 #include <iostream>
 
-#include "oo_model.hpp"
+#include "model.hpp"
 
 #include <ncurses.h>
 using namespace std::chrono;

@@ -8,8 +8,8 @@
 #include <thread>
 #include <vector>
 
-#include "oo_model.hpp"
-#include "01-playback.hpp"
+#include "model.hpp"
+#include "playback.hpp"
 
 using namespace std::chrono;
 uint64_t get_now_ms() {
@@ -74,7 +74,7 @@ int main ()
     char c = teclado->getchar();
 
     if (c == 'w') {
-        
+
 		if (firstPlay) {
   			player->play(asample);
   			firstPlay = false;

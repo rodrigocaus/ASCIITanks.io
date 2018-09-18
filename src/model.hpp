@@ -23,7 +23,7 @@ class Tanque {
   int balaAtual;
   int balaMax;
   char direcao;
-  
+
   public:
   Tanque(Coordenada velocidade, Coordenada posicao, int vidaMax, int balaAtual, int balaMax, char direcao);
   void updateMovi(Coordenada novaPosicao, Coordenada novaVelocidade, char novaDirecao);
@@ -41,7 +41,7 @@ class Bala {
   private:
   Coordenada velocidade;
   Coordenada posicao;
-  
+
   public:
   Bala(Coordenada velocidade, Coordenada posicao);
   void updateMovi(Coordenada novaPosicao);
@@ -86,7 +86,7 @@ class Tela {
     void update();
 };
 
-void threadfun (char *keybuffer, int *control);
+void threadfun(char *keybuffer, int *control);
 
 class Teclado {
   private:
