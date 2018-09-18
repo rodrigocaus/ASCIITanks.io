@@ -3,8 +3,8 @@
  *  Victor Ferrão Santolim - 187888
  */
 
-#ifndef OO_MODEL_HPP
-#define OO_MODEL_HPP
+#ifndef MODEL_HPP
+#define MODEL_HPP
 
 #include <thread>
 
@@ -17,7 +17,7 @@ typedef struct {
 class Tanque {
   private:
   Coordenada velocidade;
-  Coordenada posicao;
+  Coordenada posicao; //Posicao do caractere do quadrado mais proximo ao dois pontos ██::
   int vidaAtual;
   int vidaMax;
   int balaAtual;
@@ -52,55 +52,65 @@ class Bala {
 
 class ListaDeBalas {
  private:
-    std::vector<Corpo*> *corpos;
+    std::vector<Bala*> *balas;
 
   public:
-    ListaDeCorpos();
-    void hard_copy(ListaDeCorpos *ldc);
-    void add_corpo(Corpo *c);
-    std::vector<Corpo*> *get_corpos();
+    ListaDeBalas();
+    void hardCopy(ListaDeBalas *ldb);
+    void addBala(Bala *b);
+    std::vector<Bala*> *getBalas();
+};
+
+class ListaDeTanques {
+ private:
+    std::vector<Tanque*> *tanques;
+
+  public:
+    ListaDeTanques();
+    void hardCopy(ListaDeTanques *ldt);
+    void addTanque(Tanque *t);
+    std::vector<Tanque*> *getTanques();
 };
 
 class Fisica {
   private:
-    ListaDeCorpos *lista;
+    ListaDeTanques * ldt;
+    ListaDeBalas * ldb;
 
   public:
-    Fisica(ListaDeCorpos *ldc);
-    void add_corpo(Corpo *c);
-    void choque(char direction);
+    Fisica(ListaDeBalas *ldb , ListaDeTanques * ldt);
     void update(float deltaT);
 };
 
 class Tela {
   private:
-    ListaDeCorpos *lista, *lista_anterior;
+    ListaDeBalas *ldb;
+    ListaDeTanques *ldt;
     int maxI, maxJ;
-    float maxX, maxY;
-
+    
   public:
-    Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY);
+    Tela(ListaDeBalas *ldb, ListaDeTanques *ldt int maxI, int maxJ);
     ~Tela();
     void stop();
     void init();
     void update();
 };
 
-void threadfun(char *keybuffer, int *control);
+void threadFunction(char *keybuffer, int *control);
 
 class Teclado {
   private:
-    char ultima_captura;
+    char ultimaCaptura;
     int rodando;
 
-    std::thread kb_thread;
+    std::thread kbThread;
 
   public:
     Teclado();
     ~Teclado();
     void stop();
     void init();
-    char getchar();
+    char getChar();
 };
 
 #endif

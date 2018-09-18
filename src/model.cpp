@@ -174,23 +174,6 @@ Tela::~Tela() {
   this->stop();;
 }
 
-
-/*
-class Teclado {
-  private:
-    char ultima_captura;
-    int rodando;
-
-  public:
-    Teclado();
-    ~Teclado();
-    void stop();
-    void init();
-    char getchar();
-}
-
-*/
-
 void threadfun (char *keybuffer, int *control)
 {
   char c;
@@ -217,17 +200,16 @@ void Teclado::init() {
   curs_set(0);           /* Do not display cursor */
 
   this->rodando = 1;
-  std::thread newthread(threadfun, &(this->ultima_captura), &(this->rodando));
-  (this->kb_thread).swap(newthread);
+  (this->kbThread) = std::thread(threadFunction, &(this->ultimaCaptura), &(this->rodando));
 }
 
 void Teclado::stop() {
   this->rodando = 0;
-  (this->kb_thread).join();
+  (this->kbThread).join();
 }
 
-char Teclado::getchar() {
-  char c = this->ultima_captura;
-  this->ultima_captura = 0;
+char Teclado::getChar() {
+  char c = this->ultimaCaptura;
+  this->ultimaCaptura = 0;
   return c;
 }
