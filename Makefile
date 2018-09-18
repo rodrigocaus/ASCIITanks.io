@@ -1,9 +1,14 @@
-FLAGS=-lncurses -lpthread -lportaudio -std=c++11
+DIR = src/
+HPP = $(shell find $(DIR) -name '*.hpp')
+SRC = $(shell find $(DIR) -name '*.cpp')
+EXE = tanks.ea
+FLAGS = -std=c++11 -lncurses -lpthread -lportaudio
+
 
 all: model
 
-model: model_mainloop.cpp oo_model.cpp oo_model.hpp 01-playback.hpp 01-playback.cpp
-	g++ -omodel model_mainloop.cpp oo_model.cpp 01-playback.cpp $(FLAGS)
+model: $(SRC) $(HPP)
+	g++ $(SRC) -o $(EXE) $(FLAGS)
 
-test: model
-	./model
+play: model
+	./$(EXE)
