@@ -13,99 +13,147 @@
 #include <ncurses.h>
 using namespace std::chrono;
 
-Corpo::Corpo(float massa, float velocidade, float posicao, float mola, float viscosidade) {
-  this->massa = massa;
+Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao) {
+  this->velocidade = {0.0,0.0};
+  this->posicao = posicao;
+  this->vida = vida;
+  this->balaAtual = 0;
+  this->balaMax = balaMax;
+  this->direcao = direcao;
+}
+
+  void Tanque::updatePosicao(Coordenada novaPosicao){
+    this->posicao = novaPosicao;
+  }
+
+  void Tanque::updateVelocidade(Coordenada novaVelocidade){
+    this->velocidade = novaVelocidade;
+  }
+
+  void Tanque::updateDirecao(char novaDirecao){
+    this->direcao = novaDirecao;
+  }
+
+  void Tanque::updateBala(int novaBalaAtual){
+    this->balaAtual = novaBalaAtual;
+  }
+
+  void Tanque::updateVida(int novaVida){
+    this->vida = novaVida;
+  }
+
+  Coordenada Tanque::getVelocidade(){
+    return velocidade;
+  }
+
+  Coordenada Tanque::getPosicao(){
+    return posicao;
+  }
+
+  int Tanque::getVida(){
+    return vida;
+  }
+
+  int Tanque::getBalaAtual(){
+    return balaAtual;
+  }
+
+   int Tanque::getBalaMax(){
+    return balaMax;
+  }
+
+  char Tanque::getDirecao(){
+    return direcao;
+  }
+
+
+Bala::Bala(Coordenada velocidade, Coordenada posicao) {
   this->velocidade = velocidade;
   this->posicao = posicao;
-  this->mola = mola;
-  this->viscosidade = viscosidade;
 }
 
-void Corpo::update(float nova_velocidade, float nova_posicao) {
-  this->velocidade = nova_velocidade;
-  this->posicao = nova_posicao;
-}
-
-float Corpo::get_massa() {
-  return this->massa;
-}
-
-float Corpo::get_velocidade() {
-  return this->velocidade;
-}
-
-float Corpo::get_posicao() {
-  return this->posicao;
-}
-
-float Corpo::get_mola() {
-    return this->mola;
-}
-
-float Corpo::get_viscosidade() {
-    return this->viscosidade;
-}
-
-ListaDeCorpos::ListaDeCorpos() {
-  this->corpos = new std::vector<Corpo *>(0);
-}
-
-void ListaDeCorpos::hard_copy(ListaDeCorpos *ldc) {
-  std::vector<Corpo *> *corpos = ldc->get_corpos();
-
-  for (int k=0; k<corpos->size(); k++) {
-    Corpo *c = new Corpo( (*corpos)[k]->get_massa(),\
-                          (*corpos)[k]->get_posicao(),\
-                          (*corpos)[k]->get_velocidade(),
-                          (*corpos)[k]->get_mola(),
-                          (*corpos)[k]->get_viscosidade()
-                        );
-    this->add_corpo(c);
+  void Bala::updatePosicao(Coordenada novaPosicao){
+    this->posicao = novaPosicao;
   }
+
+  Coordenada Bala::getVelocidade(){
+    return velocidade;
+  }
+
+  Coordenada Bala::getPosicao(){
+    return posicao;
+  }
+
+
+ListaDeBalas::ListaDeBalas() {
+  this->balas = new std::vector<Bala *>(0);
 }
 
-void ListaDeCorpos::add_corpo(Corpo *c) {
-  (this->corpos)->push_back(c);
+  void ListaDeBalas::hardCopy(ListaDeBalas *ldb) {
+    std::vector<Bala *> *balas = ldb->getBalas();
+
+    for (int k=0; k<balas->size(); k++) {
+      Bala *b = new Bala((*balas)[k]->getVelocidade(), (*balas)[k]->getPosicao());
+      this->addBala(b);
+    }
+  }
+
+  void ListaDeBalas::addBala(Bala *b) {
+    (this->balas)->push_back(b);
+  }
+
+  std::vector<Bala*> *ListaDeBalas::getBalas() {
+    return (this->balas);
+  }
+
+
+ListaDeTanques::ListaDeTanques() {
+  this->tanques = new std::vector<Tanque *>(0);
 }
 
-std::vector<Corpo*> *ListaDeCorpos::get_corpos() {
-  return (this->corpos);
-}
+  void ListaDeTanques::hardCopy(ListaDeTanques *ldt) {
+    std::vector<Tanque *> *tanques = ldt->getTanques();
 
-Fisica::Fisica(ListaDeCorpos *ldc) {
-  this->lista = ldc;
+    for (int k=0; k<tanques->size(); k++) {
+      Tanque *t = new Tanque((*tanques)[k]->getPosicao(), (*tanques)[k]->getVida(),(*tanques)[k]->getBalaMax(), (*tanques)[k]->getDirecao());
+      this->addTanque(t);
+    }
+  }
+
+  void ListaDeTanques::addTanque(Tanque *t) {
+    (this->tanques)->push_back(t);
+  }
+
+  std::vector<Tanque*> *ListaDeTanques::getTanques() {
+    return (this->tanques);
+  }
+
+Fisica::Fisica(ListaDeTanques *ldt , ListaDeBalas *ldb) {
+  this->ldt = ldt;
+  this->ldb = ldb;
 }
 
 void Fisica::update(float deltaT) {
-  // Atualiza parametros dos corpos!
-  std::vector<Corpo *> *c = this->lista->get_corpos();
-  for (int i = 0; i < (*c).size(); i++) {
-    float aceleracao = ((*c)[i]->get_mola())*((*c)[i]->get_posicao());
-    aceleracao += ((*c)[i]->get_viscosidade())*((*c)[i]->get_velocidade());
-    aceleracao /= (*c)[i]->get_massa();
-    aceleracao *= -1.0;
-    float new_vel = (*c)[i]->get_velocidade() + (float)deltaT * (aceleracao)/1000;
-    float new_pos = (*c)[i]->get_posicao() + (float)deltaT * new_vel/1000;
-
-    (*c)[i]->update(new_vel, new_pos);
+  // Atualiza posicao dos tanques!
+  std::vector<Tanque *> *t = this->ldt->getTanques();
+  for(int i = 0; i < (*t).size(); i++) {
+    Coordenada novaPosicao;
+    novaPosicao = (*t)[i]->getPosicao();
+    novaPosicao.x = novaPosicao.x + ((*t)[i]->getVelocidade()).x * deltaT;
+    novaPosicao.y = novaPosicao.y + ((*t)[i]->getVelocidade()).y * deltaT;
+    (*t)[i]->updatePosicao(novaPosicao);
   }
-}
 
-void Fisica::choque(char direction) {
-  // Atualiza parametros dos corpos!
-  const float velocidade_incremento = 5;
-  std::vector<Corpo *> *c = this->lista->get_corpos();
-  for (int i = 0; i < (*c).size(); i++) {
-    float new_vel;
-    if (direction == 'u') {
-        new_vel = (*c)[i]->get_velocidade() - velocidade_incremento;
-    }
-    else if (direction == 'd') {
-        new_vel = (*c)[i]->get_velocidade() + velocidade_incremento;
-    }
-    float new_pos = (*c)[i]->get_posicao();
-    (*c)[i]->update(new_vel, new_pos);
-  }
+  // Atualiza posicao das balas
+  std::vector<Bala *> *b = this->ldb->getBalas();
+  for(int i = 0; i < (*b).size(); i++) {
+    Coordenada novaPosicao;
+    novaPosicao = (*b)[i]->getPosicao();
+    novaPosicao.x = novaPosicao.x + ((*b)[i]->getVelocidade()).x * deltaT;
+    novaPosicao.y = novaPosicao.y + ((*b)[i]->getVelocidade()).y * deltaT;
+    (*b)[i]->updatePosicao(novaPosicao);
+  }  
+  
 }
 
 Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY) {

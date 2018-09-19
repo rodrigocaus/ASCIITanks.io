@@ -18,22 +18,24 @@ class Tanque {
   private:
   Coordenada velocidade;
   Coordenada posicao; //Posicao do caractere do quadrado mais proximo ao dois pontos ██::
-  int vidaAtual;
-  int vidaMax;
+  int vida;
   int balaAtual;
   int balaMax;
   char direcao;
 
   public:
-  Tanque(Coordenada velocidade, Coordenada posicao, int vidaMax, int balaAtual, int balaMax, char direcao);
-  void updateMovi(Coordenada novaPosicao, Coordenada novaVelocidade, char novaDirecao);
+  Tanque(Coordenada posicao, int vida, int balaMax, char direcao);
+  void updatePosicao(Coordenada novaPosicao);
+  void updateVelocidade(Coordenada novaVelocidade);
+  void updateDirecao(char novaDirecao);
   void updateBala(int novaBalaAtual);
-  void updateVida(int novaVidaAtual);
+  void updateVida(int novaVida);
 
   Coordenada getVelocidade();
   Coordenada getPosicao();
-  int getVidaAtual();
+  int getVida();
   int getBalaAtual();
+  int getBalaMax();
   char getDirecao();
 };
 
@@ -44,7 +46,7 @@ class Bala {
 
   public:
   Bala(Coordenada velocidade, Coordenada posicao);
-  void updateMovi(Coordenada novaPosicao);
+  void updatePosicao(Coordenada novaPosicao);
 
   Coordenada getVelocidade();
   Coordenada getPosicao();
@@ -78,8 +80,9 @@ class Fisica {
     ListaDeBalas * ldb;
 
   public:
-    Fisica(ListaDeBalas *ldb , ListaDeTanques * ldt);
+    Fisica(ListaDeTanques * ldt , ListaDeBalas *ldb);
     void update(float deltaT);
+
 };
 
 class Tela {
