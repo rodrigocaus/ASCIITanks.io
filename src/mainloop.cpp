@@ -11,6 +11,9 @@
 #include "model.hpp"
 #include "playback.hpp"
 
+#define MAXX 40
+#define MAXY 100
+
 using namespace std::chrono;
 uint64_t get_now_ms() {
   return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
@@ -18,7 +21,7 @@ uint64_t get_now_ms() {
 
 int main ()
 {
-
+/*
   Audio::Sample *asample;
   asample = new Audio::Sample();
   asample->load("assets/blip.dat");
@@ -26,23 +29,25 @@ int main ()
   Audio::Player *player;
   player = new Audio::Player();
   player->init();
+*/
+  Bala *b1 = new Bala({0.01, 0.01}, {2, 3});
+  Bala *b2 = new Bala({0.0, 0.01}, {7, 5});
+  Bala *b3 = new Bala({0.01, 0.0}, {2, 10});
+  Bala *b4 = new Bala({0.03, 0.0}, {7, 2});
+  Bala *b5 = new Bala({0.0, 0.001}, {0, 0});
 
-  bool firstPlay = true;
+  ListaDeBalas *ldb = new ListaDeBalas();
+  ldb->addBala(b1);
+  ldb->addBala(b2);
+  ldb->addBala(b3);
+  ldb->addBala(b4);
+  ldb->addBala(b5);
 
-  Corpo *c1 = new Corpo(10, 0, 0, 100.0, 3.0);
-  Corpo *c2 = new Corpo(10, 0, 0, 100.0, 1.5);
-  Corpo *c3 = new Corpo(10, 0, 0, 200.0, 0.5);
-  Corpo *c4 = new Corpo(10, 0, 0, 200.0, 1.5);
+  ListaDeTanques *ldt = new ListaDeTanques();
 
-  ListaDeCorpos *l = new ListaDeCorpos();
-  l->add_corpo(c1);
-  l->add_corpo(c2);
-  l->add_corpo(c3);
-  l->add_corpo(c4);
+  Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
 
-  Fisica *f = new Fisica(l);
-
-  Tela *tela = new Tela(l, 20, 20, 20, 20);
+  Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
   tela->init();
 
   Teclado *teclado = new Teclado();
@@ -71,39 +76,18 @@ int main ()
     tela->update();
 
     // Lê o teclado
-    char c = teclado->getchar();
+    char c = teclado->getChar();
 
-    if (c == 'w') {
-
-		if (firstPlay) {
-  			player->play(asample);
-  			firstPlay = false;
-  		} else {
-  			asample->set_position(0);
-  		}
-
-        f->choque('u');
-    }
-    else if (c == 's') {
-
-    	if (firstPlay) {
-  			player->play(asample);
-  			firstPlay = false;
-  		} else {
-  			asample->set_position(0);
-  		}
-        f->choque('d');
-    }
     if (c == 'q') {
       break;
     }
 
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(30));
+    std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
   }
 
-  player->stop();
+  //player->stop();
   tela->stop();
   teclado->stop();
   return 0;

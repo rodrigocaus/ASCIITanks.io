@@ -14,7 +14,7 @@
 using namespace std::chrono;
 
 Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao) {
-  this->velocidade = {0.0,0.0};
+  this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
   this->vida = vida;
   this->balaAtual = 0;
@@ -102,6 +102,12 @@ ListaDeBalas::ListaDeBalas() {
     (this->balas)->push_back(b);
   }
 
+  Bala *ListaDeBalas::removeBala(int index) {
+    Bala *b = (*(this->balas))[index];
+    (this->balas)->erase((this->balas)->begin() + index);
+    return b;
+  }
+
   std::vector<Bala*> *ListaDeBalas::getBalas() {
     return (this->balas);
   }
@@ -128,15 +134,17 @@ ListaDeTanques::ListaDeTanques() {
     return (this->tanques);
   }
 
-Fisica::Fisica(ListaDeTanques *ldt , ListaDeBalas *ldb) {
+Fisica::Fisica(ListaDeTanques *ldt , ListaDeBalas *ldb, float maxX, float maxY) {
   this->ldt = ldt;
   this->ldb = ldb;
+  this->maxX = maxX;
+  this->maxY = maxY;
 }
 
 void Fisica::update(float deltaT) {
-  // Atualiza posicao dos tanques!
+  // Atualiza posicao dos tanques
   std::vector<Tanque *> *t = this->ldt->getTanques();
-  for(int i = 0; i < (*t).size(); i++) {
+  for(int i = 0; i < t->size(); i++) {
     Coordenada novaPosicao;
     novaPosicao = (*t)[i]->getPosicao();
     novaPosicao.x = novaPosicao.x + ((*t)[i]->getVelocidade()).x * deltaT;
@@ -146,70 +154,82 @@ void Fisica::update(float deltaT) {
 
   // Atualiza posicao das balas
   std::vector<Bala *> *b = this->ldb->getBalas();
-  for(int i = 0; i < (*b).size(); i++) {
+  for(int i = 0; i < b->size(); i++) {
     Coordenada novaPosicao;
     novaPosicao = (*b)[i]->getPosicao();
     novaPosicao.x = novaPosicao.x + ((*b)[i]->getVelocidade()).x * deltaT;
     novaPosicao.y = novaPosicao.y + ((*b)[i]->getVelocidade()).y * deltaT;
-    (*b)[i]->updatePosicao(novaPosicao);
-  }  
-  
+    // Fora dos limites, a bala é destruida
+    if(novaPosicao.x > this->maxX || novaPosicao.y > this->maxY
+        || novaPosicao.x < 0 || novaPosicao.y < 0) {
+        delete this->ldb->removeBala(i);
+        i--;
+    }
+    else {
+        (*b)[i]->updatePosicao(novaPosicao);
+    }
+
+  }
+
 }
 
-Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY) {
-  this->lista = ldc;
-  this->lista_anterior = new ListaDeCorpos();
-  this->lista_anterior->hard_copy(this->lista);
+Tela::Tela(ListaDeTanques *ldt, ListaDeBalas *ldb, int maxI, int maxJ) {
+  this->ldt = ldt;
+  this->ldb = ldb;
   this->maxI = maxI;
   this->maxJ = maxJ;
-  this->maxX = maxX;
-  this->maxY = maxY;
 }
 
 void Tela::init() {
   initscr();			       /* Start curses mode 		*/
-	raw();				         /* Line buffering disabled	*/
+  raw();				         /* Line buffering disabled	*/
   curs_set(0);           /* Do not display cursor */
 }
 
 void Tela::update() {
-  int i;
-  int offset = this->maxI/2;
+  Coordenada pos;
+  // Apaga todos os corpos da tela
+  clear();
 
-  std::vector<Corpo *> *corpos_old = this->lista_anterior->get_corpos();
+  // Desenha balas na tela
+  std::vector<Bala *> *balas = this->ldb->getBalas();
 
-  // Apaga corpos na tela
-  for (int k=0; k<corpos_old->size(); k++)
+  for (int k=0; k<balas->size(); k++)
   {
-    i = (int) ((*corpos_old)[k]->get_posicao()) * \
-        (this->maxI / this->maxX);
-    i += offset;
+    pos = ((*balas)[k]->getPosicao());
 
-    if(i < this->maxI && i > 0){
-        move(i, k);   /* Move cursor to position */
-        echochar(' ');  /* Prints character, advances a position */
-    }
+    move((int) pos.x, (int) pos.y);   /* Move cursor to position */
+    echochar('o');  /* Prints character, advances a position */
   }
 
-  // Desenha corpos na tela
-  std::vector<Corpo *> *corpos = this->lista->get_corpos();
+  // Desenha tanques na tela
+  std::vector<Tanque *> *tanques = this->ldt->getTanques();
 
-  for (int k=0; k<corpos->size(); k++)
+  for (int k=0; k<tanques->size(); k++)
   {
-    i = (int) ((*corpos)[k]->get_posicao()) * \
-        (this->maxI / this->maxX);
-    i += offset;
+    pos = ((*tanques)[k]->getPosicao());
 
-    if(i < this->maxI && i > 0){
-        move(i, k);   /* Move cursor to position */
-        echochar('*');  /* Prints character, advances a position */
+    move((int) pos.x, (int) pos.y);   /* Move cursor to position */
+    char dir = (*tanques)[k]->getDirecao();
+    switch (dir) {
+        case 'w':
+            echochar('^');
+            break;
+        case 'a':
+            echochar('<');
+            break;
+        case 's':
+            echochar('v');
+            break;
+        case 'd':
+            echochar('>');
+            break;
+        default:
+            // Erro de direcao
+            echochar('e');
+            break;
     }
-
-    // Atualiza corpos antigos
-    (*corpos_old)[k]->update(  (*corpos)[k]->get_velocidade(),\
-                               (*corpos)[k]->get_posicao());
   }
-
   // Atualiza tela
   refresh();
 }
@@ -222,7 +242,7 @@ Tela::~Tela() {
   this->stop();;
 }
 
-void threadfun (char *keybuffer, int *control)
+void threadFunction(char *keybuffer, int *control)
 {
   char c;
   while ((*control) == 1) {

@@ -17,7 +17,7 @@ typedef struct {
 class Tanque {
   private:
   Coordenada velocidade;
-  Coordenada posicao; //Posicao do caractere do quadrado mais proximo ao dois pontos ██::
+  Coordenada posicao;
   int vida;
   int balaAtual;
   int balaMax;
@@ -54,33 +54,34 @@ class Bala {
 
 class ListaDeBalas {
  private:
-    std::vector<Bala*> *balas;
+    std::vector<Bala *> *balas;
 
   public:
     ListaDeBalas();
     void hardCopy(ListaDeBalas *ldb);
     void addBala(Bala *b);
-    std::vector<Bala*> *getBalas();
+	Bala *removeBala(int index);
+    std::vector<Bala *> *getBalas();
 };
 
 class ListaDeTanques {
  private:
-    std::vector<Tanque*> *tanques;
+    std::vector<Tanque *> *tanques;
 
   public:
     ListaDeTanques();
     void hardCopy(ListaDeTanques *ldt);
     void addTanque(Tanque *t);
-    std::vector<Tanque*> *getTanques();
+    std::vector<Tanque *> *getTanques();
 };
 
 class Fisica {
   private:
-    ListaDeTanques * ldt;
-    ListaDeBalas * ldb;
-
+    ListaDeTanques *ldt;
+    ListaDeBalas *ldb;
+	float maxX, maxY;
   public:
-    Fisica(ListaDeTanques * ldt , ListaDeBalas *ldb);
+    Fisica(ListaDeTanques *ldt, ListaDeBalas *ldb, float maxX, float maxY);
     void update(float deltaT);
 
 };
@@ -90,9 +91,9 @@ class Tela {
     ListaDeBalas *ldb;
     ListaDeTanques *ldt;
     int maxI, maxJ;
-    
+
   public:
-    Tela(ListaDeBalas *ldb, ListaDeTanques *ldt int maxI, int maxJ);
+    Tela(ListaDeTanques *ldt, ListaDeBalas *ldb, int maxI, int maxJ);
     ~Tela();
     void stop();
     void init();
