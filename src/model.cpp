@@ -13,6 +13,10 @@
 #include <ncurses.h>
 using namespace std::chrono;
 
+float distancia(Coordenada p, Coordenada q) {
+	return (float) sqrt((p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
+}
+
 Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao) {
   this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
@@ -275,8 +279,7 @@ void Fisica::update(float deltaT) {
   //Tanques colidindo com balas
   for(int i = 0; i < t->size(); i++) {
       for(int j = 0; j < b->size(); j++){
-          if((int)((*t)[i]->getPosicao()).x == (int)((*b)[j]->getPosicao()).x &&
-            (int)((*t)[i]->getPosicao()).y == (int)((*b)[j]->getPosicao()).y)
+          if(distancia((*t)[i]->getPosicao(), (*b)[j]->getPosicao()) < 1.0)
           {
               // Deletamos a bala
               delete this->ldb->removeBala(j);

@@ -47,6 +47,7 @@ int main ()
   ListaDeBalas *ldb = new ListaDeBalas();
   Tanque *tanque = new Tanque({10.0, 10.0}, 1, 1, 'd');
   Tanque *morre = new Tanque({20.0, 20.0}, 3, 1, 'a');
+  morre->updateVelocidade({0.002, 0.002});
   ListaDeTanques *ldt = new ListaDeTanques();
   ldt->addTanque(tanque);
   ldt->addTanque(morre);
@@ -103,6 +104,5 @@ int main ()
   //player->stop();
   tela->stop();
   teclado->stop();
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   return 0;
 }

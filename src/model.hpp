@@ -7,11 +7,14 @@
 #define MODEL_HPP
 
 #include <thread>
+#include <cmath>
 
 typedef struct {
 	float x;
 	float y;
 } Coordenada;
+
+float distancia(Coordenada p, Coordenada q);
 
 class Bala {
   private:
