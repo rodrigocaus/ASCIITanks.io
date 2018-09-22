@@ -30,6 +30,7 @@ int main ()
   player = new Audio::Player();
   player->init();
 */
+/*
   Bala *b1 = new Bala({0.01, 0.01}, {2, 3});
   Bala *b2 = new Bala({0.0, 0.01}, {7, 5});
   Bala *b3 = new Bala({0.01, 0.0}, {2, 10});
@@ -42,8 +43,14 @@ int main ()
   ldb->addBala(b3);
   ldb->addBala(b4);
   ldb->addBala(b5);
-
+*/
+  ListaDeBalas *ldb = new ListaDeBalas();
+  Tanque *tanque = new Tanque({10.0, 10.0}, 1, 1, 'd');
+  Tanque *morre = new Tanque({20.0, 20.0}, 3, 1, 'a');
   ListaDeTanques *ldt = new ListaDeTanques();
+  ldt->addTanque(tanque);
+  ldt->addTanque(morre);
+
 
   Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
 
@@ -75,20 +82,27 @@ int main ()
     // Atualiza tela
     tela->update();
 
+    //Verifica se o tanque morreu
+    ldt->verificaTanquesMortos();
+
     // Lê o teclado
     char c = teclado->getChar();
-
+    Bala *novaBala = tanque->comando(c);
+    if(novaBala != NULL){
+        ldb->addBala(novaBala);
+    }
     if (c == 'q') {
+      //Sair do jogo
       break;
     }
 
-
-    std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
     i++;
   }
 
   //player->stop();
   tela->stop();
   teclado->stop();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   return 0;
 }

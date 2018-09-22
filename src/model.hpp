@@ -13,6 +13,20 @@ typedef struct {
 	float y;
 } Coordenada;
 
+class Bala {
+  private:
+  Coordenada velocidade;
+  Coordenada posicao;
+
+  public:
+  Bala(Coordenada velocidade, Coordenada posicao);
+  Bala(char direcao, Coordenada posicao , float velocidadePadrao = 0.05);
+  void updatePosicao(Coordenada novaPosicao);
+
+  Coordenada getVelocidade();
+  Coordenada getPosicao();
+};
+
 
 class Tanque {
   private:
@@ -22,9 +36,9 @@ class Tanque {
   int balaAtual;
   int balaMax;
   char direcao;
-
+  float velocidadePadrao;
   public:
-  Tanque(Coordenada posicao, int vida, int balaMax, char direcao);
+  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao = 0.025);
   void updatePosicao(Coordenada novaPosicao);
   void updateVelocidade(Coordenada novaVelocidade);
   void updateDirecao(char novaDirecao);
@@ -37,19 +51,8 @@ class Tanque {
   int getBalaAtual();
   int getBalaMax();
   char getDirecao();
-};
 
-class Bala {
-  private:
-  Coordenada velocidade;
-  Coordenada posicao;
-
-  public:
-  Bala(Coordenada velocidade, Coordenada posicao);
-  void updatePosicao(Coordenada novaPosicao);
-
-  Coordenada getVelocidade();
-  Coordenada getPosicao();
+  Bala *comando(char c);
 };
 
 class ListaDeBalas {
@@ -73,6 +76,8 @@ class ListaDeTanques {
     void hardCopy(ListaDeTanques *ldt);
     void addTanque(Tanque *t);
     std::vector<Tanque *> *getTanques();
+	Tanque *removeTanque(int index);
+	void verificaTanquesMortos();
 };
 
 class Fisica {

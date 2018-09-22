@@ -13,13 +13,14 @@
 #include <ncurses.h>
 using namespace std::chrono;
 
-Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao) {
+Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao) {
   this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
   this->vida = vida;
-  this->balaAtual = 0;
+  this->balaAtual = 100;
   this->balaMax = balaMax;
   this->direcao = direcao;
+  this->velocidadePadrao = velocidadePadrao;
 }
 
   void Tanque::updatePosicao(Coordenada novaPosicao){
@@ -58,18 +59,86 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao) {
     return balaAtual;
   }
 
-   int Tanque::getBalaMax(){
+   int Tanque::getBalaMax() {
     return balaMax;
   }
 
-  char Tanque::getDirecao(){
+  char Tanque::getDirecao() {
     return direcao;
   }
 
+  Bala *Tanque::comando(char c) {
+      Bala *b = NULL;
+      switch (c) {
+        case 'w':
+          this->updateDirecao('w');
+          this->updateVelocidade({-(this->velocidadePadrao)/2, 0.0});
+          break;
+        case 'a':
+          this->updateDirecao('a');
+          this->updateVelocidade({0.0, -(this->velocidadePadrao)});
+          break;
+        case 's':
+          this->updateDirecao('s');
+          this->updateVelocidade({(this->velocidadePadrao)/2, 0.0});
+          break;
+        case 'd':
+          this->updateDirecao('d');
+          this->updateVelocidade({0.0, (this->velocidadePadrao)});
+          break;
+        case ' ':
+          if(this->balaAtual > 0) {
+              this->balaAtual -= 1;
+              Coordenada posBala = this->getPosicao();
+              switch (this->direcao) {
+                  case 'w':
+                    posBala.x -= 1.0;
+                    break;
+                  case 'a':
+                    posBala.y -= 1.0;
+                    break;
+                  case 's':
+                    posBala.x += 1.0;
+                    break;
+                  case 'd':
+                  default:
+                    posBala.y += 1.0;
+                    break;
+              }
+              b = new Bala(this->direcao , posBala);
+
+          }
+          break;
+        default:
+          this->updateVelocidade({0.0, 0.0});
+          break;
+
+      }
+      return b;
+  }
 
 Bala::Bala(Coordenada velocidade, Coordenada posicao) {
   this->velocidade = velocidade;
   this->posicao = posicao;
+}
+
+Bala::Bala(char direcao, Coordenada posicao , float velocidadePadrao) {
+    switch (direcao) {
+        case 'w':
+          this->velocidade = {-velocidadePadrao/2 , 0.0};
+          break;
+        case 'a':
+          this->velocidade = {0.0 , -velocidadePadrao};
+          break;
+        case 's':
+          this->velocidade = {velocidadePadrao/2 , 0.0};
+          break;
+        case 'd':
+        default:
+          this->velocidade = {0.0 , velocidadePadrao};
+          break;
+    }
+    this->posicao = posicao;
 }
 
   void Bala::updatePosicao(Coordenada novaPosicao){
@@ -134,6 +203,21 @@ ListaDeTanques::ListaDeTanques() {
     return (this->tanques);
   }
 
+  Tanque *ListaDeTanques::removeTanque(int index) {
+    Tanque *t = (*(this->tanques))[index];
+    (this->tanques)->erase((this->tanques)->begin() + index);
+    return t;
+  }
+
+  void ListaDeTanques::verificaTanquesMortos() {
+    for (int i = 0; i < this->tanques->size(); i++) {
+        if((*(this->tanques))[i]->getVida() <= 0) {
+            this->removeTanque(i);
+            i--;
+        }
+    }
+  }
+
 Fisica::Fisica(ListaDeTanques *ldt , ListaDeBalas *ldb, float maxX, float maxY) {
   this->ldt = ldt;
   this->ldb = ldb;
@@ -149,7 +233,23 @@ void Fisica::update(float deltaT) {
     novaPosicao = (*t)[i]->getPosicao();
     novaPosicao.x = novaPosicao.x + ((*t)[i]->getVelocidade()).x * deltaT;
     novaPosicao.y = novaPosicao.y + ((*t)[i]->getVelocidade()).y * deltaT;
+
+    // O tanque para ao chegar na parede
+    if(novaPosicao.x > this->maxX) {
+      novaPosicao.x = this->maxX;
+    }
+    else if(novaPosicao.x < 0) {
+      novaPosicao.x = 0;
+    }
+    if(novaPosicao.y > this->maxY) {
+        novaPosicao.y = this->maxY;
+    }
+    else if(novaPosicao.y < 0) {
+        novaPosicao.y = 0;
+    }
+
     (*t)[i]->updatePosicao(novaPosicao);
+
   }
 
   // Atualiza posicao das balas
@@ -169,6 +269,22 @@ void Fisica::update(float deltaT) {
         (*b)[i]->updatePosicao(novaPosicao);
     }
 
+  }
+
+  //Verificação de colisoes
+  //Tanques colidindo com balas
+  for(int i = 0; i < t->size(); i++) {
+      for(int j = 0; j < b->size(); j++){
+          if((int)((*t)[i]->getPosicao()).x == (int)((*b)[j]->getPosicao()).x &&
+            (int)((*t)[i]->getPosicao()).y == (int)((*b)[j]->getPosicao()).y)
+          {
+              // Deletamos a bala
+              delete this->ldb->removeBala(j);
+              j--;
+              // Decrementamos a vida do tanque
+              (*t)[i]->updateVida((*t)[i]->getVida() - 1);
+          }
+      }
   }
 
 }
@@ -199,7 +315,7 @@ void Tela::update() {
     pos = ((*balas)[k]->getPosicao());
 
     move((int) pos.x, (int) pos.y);   /* Move cursor to position */
-    echochar('o');  /* Prints character, advances a position */
+    addch('o');  /* Prints character, advances a position */
   }
 
   // Desenha tanques na tela
@@ -213,20 +329,20 @@ void Tela::update() {
     char dir = (*tanques)[k]->getDirecao();
     switch (dir) {
         case 'w':
-            echochar('^');
+            addch('^');
             break;
         case 'a':
-            echochar('<');
+            addch('<');
             break;
         case 's':
-            echochar('v');
+            addch('v');
             break;
         case 'd':
-            echochar('>');
+            addch('>');
             break;
         default:
             // Erro de direcao
-            echochar('e');
+            addch('e');
             break;
     }
   }
@@ -263,8 +379,8 @@ Teclado::~Teclado() {
 void Teclado::init() {
   // Inicializa ncurses
   raw();				         /* Line buffering disabled	*/
-	keypad(stdscr, TRUE);	 /* We get F1, F2 etc..		*/
-	noecho();			         /* Don't echo() while we do getch */
+  keypad(stdscr, TRUE);	 /* We get F1, F2 etc..		*/
+  noecho();			         /* Don't echo() while we do getch */
   curs_set(0);           /* Do not display cursor */
 
   this->rodando = 1;
