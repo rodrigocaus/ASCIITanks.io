@@ -3,13 +3,11 @@
  *  Victor Ferrão Santolim - 187888
  */
 
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <vector>
-
 #include "model.hpp"
 #include "playback.hpp"
+#include "Teclado.hpp"
+#include "Fisica.hpp"
+#include "Tela.hpp"
 
 #define MAXX 40
 #define MAXY 100

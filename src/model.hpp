@@ -6,8 +6,12 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <thread>
+#include <chrono>
 #include <cmath>
+#include <iostream>
+#include <thread>
+#include <vector>
+
 
 typedef struct {
 	float x;
@@ -81,48 +85,6 @@ class ListaDeTanques {
     std::vector<Tanque *> *getTanques();
 	Tanque *removeTanque(int index);
 	void verificaTanquesMortos();
-};
-
-class Fisica {
-  private:
-    ListaDeTanques *ldt;
-    ListaDeBalas *ldb;
-	float maxX, maxY;
-  public:
-    Fisica(ListaDeTanques *ldt, ListaDeBalas *ldb, float maxX, float maxY);
-    void update(float deltaT);
-
-};
-
-class Tela {
-  private:
-    ListaDeBalas *ldb;
-    ListaDeTanques *ldt;
-    int maxI, maxJ;
-
-  public:
-    Tela(ListaDeTanques *ldt, ListaDeBalas *ldb, int maxI, int maxJ);
-    ~Tela();
-    void stop();
-    void init();
-    void update();
-};
-
-void threadFunction(char *keybuffer, int *control);
-
-class Teclado {
-  private:
-    char ultimaCaptura;
-    int rodando;
-
-    std::thread kbThread;
-
-  public:
-    Teclado();
-    ~Teclado();
-    void stop();
-    void init();
-    char getChar();
 };
 
 #endif
