@@ -1,3 +1,7 @@
+/*
+ *  Rodrigo Oliveira Caus - 186807
+ *  Victor Ferrão Santolim - 187888
+ */
 
 #include "model.hpp"
 #include "Tela.hpp"

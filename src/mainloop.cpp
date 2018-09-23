@@ -28,23 +28,16 @@ int main ()
   player = new Audio::Player();
   player->init();
 */
-/*
-  Bala *b1 = new Bala({0.01, 0.01}, {2, 3});
+
   Bala *b2 = new Bala({0.0, 0.01}, {7, 5});
   Bala *b3 = new Bala({0.01, 0.0}, {2, 10});
-  Bala *b4 = new Bala({0.03, 0.0}, {7, 2});
-  Bala *b5 = new Bala({0.0, 0.001}, {0, 0});
 
   ListaDeBalas *ldb = new ListaDeBalas();
-  ldb->addBala(b1);
   ldb->addBala(b2);
   ldb->addBala(b3);
-  ldb->addBala(b4);
-  ldb->addBala(b5);
-*/
-  ListaDeBalas *ldb = new ListaDeBalas();
+
   Tanque *tanque = new Tanque({10.0, 10.0}, 1, 1, 'd');
-  Tanque *morre = new Tanque({20.0, 20.0}, 3, 1, 'a');
+  Tanque *morre = new Tanque({20.0, 20.0}, 1, 1, 'a');
   morre->updateVelocidade({0.002, 0.002});
   ListaDeTanques *ldt = new ListaDeTanques();
   ldt->addTanque(tanque);
@@ -62,12 +55,10 @@ int main ()
   uint64_t t0;
   uint64_t t1;
   uint64_t deltaT;
-  uint64_t T;
 
   int i = 0;
 
-  T = get_now_ms();
-  t1 = T;
+  t1 = get_now_ms();
 
   while (1) {
     // Atualiza timers
@@ -82,6 +73,10 @@ int main ()
     tela->update();
 
     //Verifica se o tanque morreu
+    if(tanque->getVida() <= 0) {
+        //Game Over
+        break;
+    }
     ldt->verificaTanquesMortos();
 
     // Lê o teclado

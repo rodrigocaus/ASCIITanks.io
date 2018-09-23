@@ -1,3 +1,8 @@
+/*
+ *  Rodrigo Oliveira Caus - 186807
+ *  Victor Ferrão Santolim - 187888
+ */
+
 #ifndef TECLADO_HPP
 #define TECLADO_HPP
 

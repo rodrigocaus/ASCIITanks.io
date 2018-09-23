@@ -3,7 +3,6 @@
  *  Victor Ferrão Santolim - 187888
  */
 
-
 #include "model.hpp"
 #include "Fisica.hpp"
 
@@ -62,8 +61,8 @@ void Fisica::update(float deltaT) {
 
   }
 
-  //Verificação de colisoes
-  //Tanques colidindo com balas
+  // Verificação de colisoes
+  // Tanques colidindo com balas
   for(int i = 0; i < t->size(); i++) {
       for(int j = 0; j < b->size(); j++){
           if(distancia((*t)[i]->getPosicao(), (*b)[j]->getPosicao()) < 1.0)
@@ -76,5 +75,29 @@ void Fisica::update(float deltaT) {
           }
       }
   }
-
+  // Tanques colidindo com tanques
+  for(int i = 0; i < t->size(); i++) {
+      for(int j = i+1; j < t->size(); j++){
+          if(distancia((*t)[i]->getPosicao(), (*t)[j]->getPosicao()) < 1.0)
+          {
+              // Decrementamos a vida do tanque
+              (*t)[i]->updateVida((*t)[i]->getVida() - 1);
+               (*t)[j]->updateVida((*t)[j]->getVida() - 1);
+          }
+      }
+  }
+  // Balas colidindo com balas
+  for(int i = 0; i < b->size(); i++) {
+      for(int j = i+1; j < b->size(); j++){
+          if(distancia((*b)[i]->getPosicao(), (*b)[j]->getPosicao()) < 1.0)
+          {
+              // Deletamos as balas
+              delete this->ldb->removeBala(j);
+              j--;
+              delete this->ldb->removeBala(i);
+              i--;
+              break;
+          }
+      }
+  }
 }

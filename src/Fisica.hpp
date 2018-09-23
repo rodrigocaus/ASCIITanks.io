@@ -1,3 +1,8 @@
+/*
+ *  Rodrigo Oliveira Caus - 186807
+ *  Victor Ferrão Santolim - 187888
+ */
+
 #ifndef FISICA_HPP
 #define FISICA_HPP
 
