@@ -1,14 +1,17 @@
 DIR = src/
-HPP = $(shell find $(DIR) -name '*.hpp')
-SRC = $(shell find $(DIR) -name '*.cpp')
+HPP := $(wildcard $(DIR)*.hpp)
+SRC := $(wildcard $(DIR)*.cpp)
 EXE = tanks.ea
 FLAGS = -std=c++11 -lncurses -lpthread -lportaudio
 
 
-all: model
+all: $(EXE)
 
-model: $(SRC) $(HPP)
+$(EXE): $(SRC) $(HPP)
 	g++ $(SRC) -o $(EXE) $(FLAGS)
 
-play: model
+play: $(EXE)
 	./$(EXE)
+
+clean: $(EXE)
+	rm $(EXE)
