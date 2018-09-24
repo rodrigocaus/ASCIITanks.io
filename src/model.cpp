@@ -35,7 +35,12 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
   }
 
   void Tanque::updateBala(int novaBalaAtual){
-    this->balaAtual = novaBalaAtual;
+	if(novaBalaAtual > this->balaMax) {
+		this->balaAtual = this->balaMax;
+	}
+	else {
+		this->balaAtual = novaBalaAtual;
+	}
   }
 
   void Tanque::updateVida(int novaVida){
@@ -219,4 +224,10 @@ ListaDeTanques::ListaDeTanques() {
             i--;
         }
     }
+  }
+
+  void ListaDeTanques::incrementaMunicao() {
+	  for (int i = 0; i < this->tanques->size(); i++) {
+		  (*(this->tanques))[i]->updateBala((*(this->tanques))[i]->getBalaAtual() + 1);
+      }
   }

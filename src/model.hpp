@@ -88,6 +88,7 @@ class ListaDeTanques {
     std::vector<Tanque *> *getTanques();
 	Tanque *removeTanque(int index);
 	void verificaTanquesMortos();
+	void incrementaMunicao();
 };
 
 #endif

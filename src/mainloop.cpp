@@ -8,6 +8,7 @@
 #include "Teclado.hpp"
 #include "Fisica.hpp"
 #include "Tela.hpp"
+#include "Bot.hpp"
 
 #define MAXX 30
 #define MAXY 60
@@ -29,19 +30,11 @@ int main ()
   player->init();
 */
 
-  Bala *b2 = new Bala({0.0, 0.01}, {7, 5});
-  Bala *b3 = new Bala({0.01, 0.0}, {2, 10});
-
   ListaDeBalas *ldb = new ListaDeBalas();
-  ldb->addBala(b2);
-  ldb->addBala(b3);
 
-  Tanque *tanque = new Tanque({10.0, 10.0}, 1, 1, 'd');
-  Tanque *morre = new Tanque({20.0, 20.0}, 1, 1, 'a', 0.025, true);
-  morre->updateVelocidade({0.002, 0.002});
+  Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
   ListaDeTanques *ldt = new ListaDeTanques();
-  ldt->addTanque(tanque);
-  ldt->addTanque(morre);
+  ldt->addTanque(meuTanque);
 
 
   Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
@@ -51,6 +44,8 @@ int main ()
 
   Teclado *teclado = new Teclado();
   teclado->init();
+
+  Bot *bot = new Bot(ldt, meuTanque, MAXX - 2);
 
   uint64_t t0;
   uint64_t t1;
@@ -73,7 +68,7 @@ int main ()
     tela->update();
 
     //Verifica se o tanque morreu
-    if(tanque->getVida() <= 0) {
+    if(meuTanque->getVida() <= 0) {
         //Game Over
         break;
     }
@@ -81,7 +76,7 @@ int main ()
 
     // Lê o teclado
     char c = teclado->getChar();
-    Bala *novaBala = tanque->comando(c);
+    Bala *novaBala = meuTanque->comando(c);
     if(novaBala != NULL){
         ldb->addBala(novaBala);
     }
@@ -90,6 +85,20 @@ int main ()
       break;
     }
 
+    // Secção de comandos para os tanques
+    if (i%25 == 0) {
+        ldt->incrementaMunicao();
+    }
+    if (i%50 == 0) {
+        bot->comanda();
+    }
+    if (i%35 == 0) {
+        bot->atira(ldb);
+    }
+    if (i == 100) {
+        ldt->addTanque(bot->spawn());
+        i = 0;
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     i++;
   }
