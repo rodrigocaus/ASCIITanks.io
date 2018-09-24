@@ -21,31 +21,34 @@ uint64_t get_now_ms() {
 int main ()
 {
 
-  Audio::Sample *silencio = new Audio::Sample();
-  silencio->load("assets/silencio.dat");
+  Audio::Sample *somFight = new Audio::Sample();
+  somFight->load("assets/fight.dat");
 
   Audio::Sample *somTiro = new Audio::Sample();
-  somTiro->load("assets/somLaser.dat");
+  somTiro->load("assets/tiro.dat");
 
   Audio::Sample *somBoom = new Audio::Sample();
-  somBoom->load("assets/somTiro.dat");
+  somBoom->load("assets/boom.dat");
+
+  Audio::Sample *somHit = new Audio::Sample();
+  somHit->load("assets/hit.dat");
+
+  Audio::Sample *somGameOver = new Audio::Sample();
+  somGameOver->load("assets/gameOver.dat");
 
   Audio::Player *player = new Audio::Player();
   player->init();
-  player->play(silencio);
-  
-  ListaDeBalas *ldb = new ListaDeBalas();
+  player->play(somFight);
 
+  ListaDeBalas *ldb = new ListaDeBalas();
   Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
   ListaDeTanques *ldt = new ListaDeTanques();
-  bool alguemMorreu = false;
   ldt->addTanque(meuTanque);
-
-
-  Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
 
   Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
   tela->init();
+  
+  Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
 
   Teclado *teclado = new Teclado();
   teclado->init();
@@ -55,8 +58,11 @@ int main ()
   uint64_t t0;
   uint64_t t1;
   uint64_t deltaT;
-
+  uint64_t tSom0, tSom1;
+  bool alguemMorreu = false;
   int i = 0;
+  int minhaVidaAntes = 0;
+  int minhaVidaAgora = 0;
 
   t1 = get_now_ms();
 
@@ -69,16 +75,36 @@ int main ()
     t1 = get_now_ms();
     deltaT = t1-t0;
 
+    minhaVidaAntes = meuTanque->getVida();
+
     // Atualiza modelo
     f->update(deltaT);
 
     // Atualiza tela
     tela->update();
 
+    minhaVidaAgora = meuTanque->getVida();
+
     //Verifica se o tanque morreu
-    if(meuTanque->getVida() <= 0) {
+    if(minhaVidaAgora <= 0) {
         //Game Over
+
+        player->pause();
+        player->play(somGameOver);
+
+        tSom0 = get_now_ms();
+        while (1) {
+          std::this_thread::sleep_for (std::chrono::milliseconds(10));
+          tSom1 = get_now_ms();
+          if (tSom1-tSom0 > 1700) break;
+        }
         break;
+    } //Verifica se levou dano
+    else if(minhaVidaAgora < minhaVidaAntes)
+    {
+        player->pause();
+        somHit->set_position(0);
+        player->play(somHit);
     }
     
     //Verifica se os tanques inimigos morreram e produz som
