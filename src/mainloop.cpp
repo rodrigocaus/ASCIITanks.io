@@ -9,8 +9,8 @@
 #include "Fisica.hpp"
 #include "Tela.hpp"
 
-#define MAXX 40
-#define MAXY 100
+#define MAXX 30
+#define MAXY 60
 
 using namespace std::chrono;
 uint64_t get_now_ms() {
@@ -97,5 +97,6 @@ int main ()
   //player->stop();
   tela->stop();
   teclado->stop();
+  
   return 0;
 }

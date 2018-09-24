@@ -5,7 +5,6 @@
 
 #include "model.hpp"
 #include "Tela.hpp"
-#include <ncurses.h>
 
 using namespace std::chrono;
 
@@ -18,15 +17,24 @@ Tela::Tela(ListaDeTanques *ldt, ListaDeBalas *ldb, int maxI, int maxJ) {
 }
 
 void Tela::init() {
-  initscr();			       /* Start curses mode 		*/
-  raw();				         /* Line buffering disabled	*/
-  curs_set(0);           /* Do not display cursor */
+  initscr();			   /* Start curses mode 	 */
+  raw();				  /* Line buffering disabled*/
+  curs_set(0);           /* Do not display cursor  */
+  this->janelaDeJogo = newwin(this->maxI+1, this->maxJ+1, 0, 0);
+
+  start_color();
+  // Cor de fundo da janela como branco e texto em preto
+  init_pair(1, COLOR_BLACK, COLOR_WHITE);
+  wbkgd(this->janelaDeJogo, COLOR_PAIR(1));
+  // Cor para gerar tanques de outro time
+  init_pair(2, COLOR_RED, COLOR_WHITE);
+
 }
 
 void Tela::update() {
   Coordenada pos;
   // Apaga todos os corpos da tela
-  clear();
+  wclear(this->janelaDeJogo);
 
   // Desenha balas na tela
   std::vector<Bala *> *balas = this->ldb->getBalas();
@@ -35,8 +43,8 @@ void Tela::update() {
   {
     pos = ((*balas)[k]->getPosicao());
 
-    move((int) pos.x, (int) pos.y);   /* Move cursor to position */
-    addch('o');  /* Prints character, advances a position */
+    wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
+    waddch(this->janelaDeJogo, 'o');  /* Prints character, advances a position */
   }
 
   // Desenha tanques na tela
@@ -46,32 +54,52 @@ void Tela::update() {
   {
     pos = ((*tanques)[k]->getPosicao());
 
-    move((int) pos.x, (int) pos.y);   /* Move cursor to position */
+    wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
     char dir = (*tanques)[k]->getDirecao();
     switch (dir) {
         case 'w':
-            addch('^');
+            waddch(this->janelaDeJogo, '^');
             break;
         case 'a':
-            addch('<');
+            waddch(this->janelaDeJogo, '<');
             break;
         case 's':
-            addch('v');
+            waddch(this->janelaDeJogo, 'v');
             break;
         case 'd':
-            addch('>');
+            waddch(this->janelaDeJogo, '>');
             break;
         default:
             // Erro de direcao
-            addch('e');
+            waddch(this->janelaDeJogo, 'e');
             break;
     }
   }
   // Atualiza tela
-  refresh();
+  wrefresh(this->janelaDeJogo);
+}
+
+
+void Tela::imprimeVida(int v) {
+    // Limpa a região
+    for(int i = 0; i < 5; i++) {
+        move(0, this->maxJ+2+i);
+        addch(' ');
+    }
+    // Representa a vida com '#'
+    for(int i = 0; i < v; i++) {
+        move(0, this->maxJ+2+i);
+        addch('#');
+    }
+}
+
+void Tela::fimDeJogo() {
+    move(0, this->maxJ+2);
+    printw("Game Over");
 }
 
 void Tela::stop() {
+  delwin(this->janelaDeJogo);
   endwin();
 }
 
