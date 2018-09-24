@@ -26,9 +26,9 @@ void Tela::init() {
   // Cor de fundo da janela como branco e texto em preto
   init_pair(1, COLOR_BLACK, COLOR_WHITE);
   wbkgd(this->janelaDeJogo, COLOR_PAIR(1));
+
   // Cor para gerar tanques de outro time
   init_pair(2, COLOR_RED, COLOR_WHITE);
-
 }
 
 void Tela::update() {
@@ -55,6 +55,10 @@ void Tela::update() {
     pos = ((*tanques)[k]->getPosicao());
 
     wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
+
+    if((*tanques)[k]->getTime() == true){
+        wattron(this->janelaDeJogo, COLOR_PAIR(2));
+    }
     char dir = (*tanques)[k]->getDirecao();
     switch (dir) {
         case 'w':
@@ -73,6 +77,9 @@ void Tela::update() {
             // Erro de direcao
             waddch(this->janelaDeJogo, 'e');
             break;
+    }
+    if((*tanques)[k]->getTime() == true){
+        wattroff(this->janelaDeJogo, COLOR_PAIR(2));
     }
   }
   // Atualiza tela

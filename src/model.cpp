@@ -11,7 +11,7 @@ float distancia(Coordenada p, Coordenada q) {
 	return (float) sqrt((p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
 }
 
-Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao) {
+Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao, bool timeInimigo) {
   this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
   this->vida = vida;
@@ -19,6 +19,7 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
   this->balaMax = balaMax;
   this->direcao = direcao;
   this->velocidadePadrao = velocidadePadrao;
+  this->timeInimigo = timeInimigo;
 }
 
   void Tanque::updatePosicao(Coordenada novaPosicao){
@@ -63,6 +64,10 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
 
   char Tanque::getDirecao() {
     return direcao;
+  }
+
+  bool Tanque::getTime() {
+	return timeInimigo;
   }
 
   Bala *Tanque::comando(char c) {

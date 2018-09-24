@@ -44,8 +44,10 @@ class Tanque {
   int balaMax;
   char direcao;
   float velocidadePadrao;
+  bool timeInimigo;
+
   public:
-  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao = 0.025);
+  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao = 0.025, bool timeInimigo = false);
   void updatePosicao(Coordenada novaPosicao);
   void updateVelocidade(Coordenada novaVelocidade);
   void updateDirecao(char novaDirecao);
@@ -58,6 +60,7 @@ class Tanque {
   int getBalaAtual();
   int getBalaMax();
   char getDirecao();
+  bool getTime();
 
   Bala *comando(char c);
 };

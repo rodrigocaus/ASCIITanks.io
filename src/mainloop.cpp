@@ -37,7 +37,7 @@ int main ()
   ldb->addBala(b3);
 
   Tanque *tanque = new Tanque({10.0, 10.0}, 1, 1, 'd');
-  Tanque *morre = new Tanque({20.0, 20.0}, 1, 1, 'a');
+  Tanque *morre = new Tanque({20.0, 20.0}, 1, 1, 'a', 0.025, true);
   morre->updateVelocidade({0.002, 0.002});
   ListaDeTanques *ldt = new ListaDeTanques();
   ldt->addTanque(tanque);
@@ -97,6 +97,6 @@ int main ()
   //player->stop();
   tela->stop();
   teclado->stop();
-  
+
   return 0;
 }
