@@ -87,7 +87,7 @@ class ListaDeTanques {
     void addTanque(Tanque *t);
     std::vector<Tanque *> *getTanques();
 	Tanque *removeTanque(int index);
-	void verificaTanquesMortos();
+	bool verificaTanquesMortos();
 	void incrementaMunicao();
 };
 

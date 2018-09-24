@@ -3,8 +3,8 @@
  *  Victor Ferrão Santolim - 187888
  */
 
-#ifndef PLAYBACK_HPP
-#define PLAYBACK_HPP
+#ifndef SOM_HPP
+#define SOM_HPP
 
 #include "portaudio.h"
 #include <vector>

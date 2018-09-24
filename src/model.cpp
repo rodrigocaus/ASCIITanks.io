@@ -217,13 +217,16 @@ ListaDeTanques::ListaDeTanques() {
     return t;
   }
 
-  void ListaDeTanques::verificaTanquesMortos() {
+  bool ListaDeTanques::verificaTanquesMortos() {
+    bool alguemMorreu = false;
     for (int i = 0; i < this->tanques->size(); i++) {
         if((*(this->tanques))[i]->getVida() <= 0) {
             this->removeTanque(i);
             i--;
+            alguemMorreu = true;
         }
     }
+    return alguemMorreu;
   }
 
   void ListaDeTanques::incrementaMunicao() {

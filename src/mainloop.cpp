@@ -4,7 +4,7 @@
  */
 
 #include "model.hpp"
-#include "playback.hpp"
+#include "Som.hpp"
 #include "Teclado.hpp"
 #include "Fisica.hpp"
 #include "Tela.hpp"
@@ -20,20 +20,25 @@ uint64_t get_now_ms() {
 
 int main ()
 {
-/*
-  Audio::Sample *asample;
-  asample = new Audio::Sample();
-  asample->load("assets/blip.dat");
 
-  Audio::Player *player;
-  player = new Audio::Player();
+  Audio::Sample *silencio = new Audio::Sample();
+  silencio->load("assets/silencio.dat");
+
+  Audio::Sample *somTiro = new Audio::Sample();
+  somTiro->load("assets/somLaser.dat");
+
+  Audio::Sample *somBoom = new Audio::Sample();
+  somBoom->load("assets/somTiro.dat");
+
+  Audio::Player *player = new Audio::Player();
   player->init();
-*/
-
+  player->play(silencio);
+  
   ListaDeBalas *ldb = new ListaDeBalas();
 
   Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
   ListaDeTanques *ldt = new ListaDeTanques();
+  bool alguemMorreu = false;
   ldt->addTanque(meuTanque);
 
 
@@ -55,6 +60,9 @@ int main ()
 
   t1 = get_now_ms();
 
+  //Limpa eventuais comandos pre-buffered
+  teclado->getChar();
+
   while (1) {
     // Atualiza timers
     t0 = t1;
@@ -72,12 +80,26 @@ int main ()
         //Game Over
         break;
     }
-    ldt->verificaTanquesMortos();
+    
+    //Verifica se os tanques inimigos morreram e produz som
+    alguemMorreu = ldt->verificaTanquesMortos();
+    if(alguemMorreu){
+
+      player->pause();
+      somBoom->set_position(0);
+      player->play(somBoom);
+      alguemMorreu = false;
+    }
 
     // Lê o teclado
     char c = teclado->getChar();
     Bala *novaBala = meuTanque->comando(c);
     if(novaBala != NULL){
+
+        player->pause();
+        somTiro->set_position(0);
+        player->play(somTiro);
+
         ldb->addBala(novaBala);
     }
     if (c == 'q') {
@@ -103,7 +125,7 @@ int main ()
     i++;
   }
 
-  //player->stop();
+  player->stop();
   tela->stop();
   teclado->stop();
 
