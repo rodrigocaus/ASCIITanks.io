@@ -25,16 +25,19 @@ void Tela::init() {
   start_color();
   // Cor de fundo da janela como branco e texto em preto
   init_pair(1, COLOR_BLACK, COLOR_WHITE);
+  erase();
   wbkgd(this->janelaDeJogo, COLOR_PAIR(1));
 
   // Cor para gerar tanques de outro time
   init_pair(2, COLOR_RED, COLOR_WHITE);
+  refresh();
+
 }
 
 void Tela::update() {
   Coordenada pos;
   // Apaga todos os corpos da tela
-  wclear(this->janelaDeJogo);
+  werase(this->janelaDeJogo);
 
   // Desenha balas na tela
   std::vector<Bala *> *balas = this->ldb->getBalas();

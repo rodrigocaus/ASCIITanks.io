@@ -45,7 +45,7 @@ void Sample::load(const char *filename) {
   }
   this->position = 0;
 
-  std::cerr << "Total: " << count << " samples" << std::endl;
+  //std::cerr << "Total: " << count << " samples" << std::endl;
 
 }
 
