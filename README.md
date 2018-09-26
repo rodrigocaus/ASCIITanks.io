@@ -11,7 +11,7 @@ Será que você consegue?
 
 - O jogador inicia com 3 vidas
 - Os bots possuem uma vida e movimentação aleatória
-- Ser atingido ou colidir com tanques inimigos descresce a sua vida
+- Ser atingido ou colidir com tanques inimigos decresce a sua vida
 
 
 
