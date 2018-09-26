@@ -11,7 +11,7 @@ $(EXE): $(SRC) $(HPP)
 	g++ $(SRC) -o $(EXE) $(FLAGS)
 
 play: $(EXE)
-	./$(EXE)
+	./$(EXE) 2>warning.log
 
-clean: $(EXE)
+clear: $(EXE)
 	rm $(EXE)
