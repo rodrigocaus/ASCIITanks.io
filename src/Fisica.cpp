@@ -38,17 +38,19 @@ void Fisica::update(float deltaT) {
         novaPosicao.y = 0;
     }
 
+    //Atualiza
     (*t)[i]->updatePosicao(novaPosicao);
 
   }
 
-  // Atualiza posicao das balas
+  // Atualiza posicao das balas de acordo com a velocidade
   std::vector<Bala *> *b = this->ldb->getBalas();
   for(int i = 0; i < b->size(); i++) {
     Coordenada novaPosicao;
     novaPosicao = (*b)[i]->getPosicao();
     novaPosicao.x = novaPosicao.x + ((*b)[i]->getVelocidade()).x * deltaT;
     novaPosicao.y = novaPosicao.y + ((*b)[i]->getVelocidade()).y * deltaT;
+    
     // Fora dos limites, a bala é destruida
     if(novaPosicao.x > this->maxX || novaPosicao.y > this->maxY
         || novaPosicao.x < 0 || novaPosicao.y < 0) {

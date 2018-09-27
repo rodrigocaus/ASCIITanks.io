@@ -7,6 +7,7 @@
 
 using namespace std::chrono;
 
+//Calcula distancia entre duas coordenadas
 float distancia(Coordenada p, Coordenada q) {
 	return (float) sqrt((p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
 }
@@ -34,6 +35,7 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
     this->direcao = novaDirecao;
   }
 
+  //Só incrementa bala se tiver menos balas que o máximo
   void Tanque::updateBala(int novaBalaAtual){
 	if(novaBalaAtual > this->balaMax) {
 		this->balaAtual = this->balaMax;
@@ -75,8 +77,12 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
 	return timeInimigo;
   }
 
+  //Realiza movimentos e ações do tanque
   Bala *Tanque::comando(char c) {
       Bala *b = NULL;
+
+      //Nas direções w e s, ou seja, na vertical, há uma escala de redução, pois aproximamos
+      //que dois espaços tem a mesma distância horizontal que uma linha tem na horizontal.
       switch (c) {
         case 'w':
           this->updateDirecao('w');
@@ -95,9 +101,11 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
           this->updateVelocidade({0.0, (this->velocidadePadrao)});
           break;
         case ' ':
+          //Atira bala
           if(this->balaAtual > 0) {
               this->balaAtual -= 1;
               Coordenada posBala = this->getPosicao();
+              //A bala é criada uma posição a frente da direção onde o tanque está apontando
               switch (this->direcao) {
                   case 'w':
                     posBala.x -= 1.0;
@@ -130,6 +138,7 @@ Bala::Bala(Coordenada velocidade, Coordenada posicao) {
   this->posicao = posicao;
 }
 
+//Segunda opção de construtor: Polar (posição e direção ao invés de posição e velocidade)
 Bala::Bala(char direcao, Coordenada posicao , float velocidadePadrao) {
     switch (direcao) {
         case 'w':
@@ -217,6 +226,7 @@ ListaDeTanques::ListaDeTanques() {
     return t;
   }
 
+  //Verifica tanques que morreram com base na vida. Se 0 ou negativa, morreu, e deleta o tanque.
   bool ListaDeTanques::verificaTanquesMortos() {
     bool alguemMorreu = false;
     for (int i = 0; i < this->tanques->size(); i++) {

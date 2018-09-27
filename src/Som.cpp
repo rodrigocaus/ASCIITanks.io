@@ -45,8 +45,6 @@ void Sample::load(const char *filename) {
   }
   this->position = 0;
 
-  //std::cerr << "Total: " << count << " samples" << std::endl;
-
 }
 
 unsigned int Sample::get_position() {

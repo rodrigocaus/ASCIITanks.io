@@ -10,9 +10,11 @@
 #include "Tela.hpp"
 #include "Bot.hpp"
 
+//Tamanho da janela de jogo
 #define MAXX 30
 #define MAXY 60
 
+//Pega o tempo em milisegundos
 using namespace std::chrono;
 uint64_t get_now_ms() {
   return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
@@ -21,28 +23,28 @@ uint64_t get_now_ms() {
 int main ()
 {
 
+  //Cria objetos de audio e importa os sons que serão usados no jogo
   Audio::Sample *somFight = new Audio::Sample();
   somFight->load("assets/fight.dat");
-
   Audio::Sample *somTiro = new Audio::Sample();
   somTiro->load("assets/tiro.dat");
-
   Audio::Sample *somBoom = new Audio::Sample();
   somBoom->load("assets/boom.dat");
-
   Audio::Sample *somHit = new Audio::Sample();
   somHit->load("assets/hit.dat");
-
   Audio::Sample *somGameOver = new Audio::Sample();
   somGameOver->load("assets/gameOver.dat");
 
+  //Cria o objeto de tocador de audio e inicia com o som "Fight !"
   Audio::Player *player = new Audio::Player();
   player->init();
   player->play(somFight);
 
   ListaDeBalas *ldb = new ListaDeBalas();
-  Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
   ListaDeTanques *ldt = new ListaDeTanques();
+
+  //Inicialização do tanque do jogador e inclusão na lista de tanques
+  Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
   ldt->addTanque(meuTanque);
 
   Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
@@ -53,6 +55,7 @@ int main ()
   Teclado *teclado = new Teclado();
   teclado->init();
 
+  //Inicialização do primeiro tanque inimigo
   Bot *bot = new Bot(ldt, meuTanque, MAXX - 2);
 
   uint64_t t0;
@@ -75,23 +78,24 @@ int main ()
     t1 = get_now_ms();
     deltaT = t1-t0;
 
+    //Vida antes da atualização do modelo
     minhaVidaAntes = meuTanque->getVida();
-
     // Atualiza modelo
     f->update(deltaT);
-
     // Atualiza tela
     tela->update();
-
+    //Vida após a atualização do modelo
     minhaVidaAgora = meuTanque->getVida();
 
     //Verifica se o tanque morreu
     if(minhaVidaAgora <= 0) {
         //Game Over
 
+        //Toca som de game over
         player->pause();
         player->play(somGameOver);
 
+        //Espera o som acabar antes de encerrar o jogo
         tSom0 = get_now_ms();
         while (1) {
           std::this_thread::sleep_for (std::chrono::milliseconds(10));
@@ -102,6 +106,8 @@ int main ()
     } //Verifica se levou dano
     else if(minhaVidaAgora < minhaVidaAntes)
     {
+       
+        //Toca som de hit
         player->pause();
         somHit->set_position(0);
         player->play(somHit);
@@ -119,6 +125,8 @@ int main ()
 
     // Lê o teclado
     char c = teclado->getChar();
+
+    //Se houve uma bala gerada, reproduz som de tiro
     Bala *novaBala = meuTanque->comando(c);
     if(novaBala != NULL){
 
@@ -134,23 +142,25 @@ int main ()
     }
 
     // Secção de comandos para os tanques
+    // Realiza ações com base no número de ciclos passados 
     if (i%25 == 0) {
-        ldt->incrementaMunicao();
+        ldt->incrementaMunicao(); //Recarrega
     }
     if (i%50 == 0) {
-        bot->comanda();
+        bot->comanda(); //Move
     }
     if (i%35 == 0) {
-        bot->atira(ldb);
+        bot->atira(ldb); //Atira
     }
     if (i == 100) {
-        ldt->addTanque(bot->spawn());
+        ldt->addTanque(bot->spawn()); //Novo tanque inimigo criado
         i = 0;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     i++;
   }
 
+  //Encerra o programa
   player->stop();
   tela->stop();
   teclado->stop();
