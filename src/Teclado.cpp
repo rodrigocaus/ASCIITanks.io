@@ -6,7 +6,7 @@
 #include "model.hpp"
 #include "Teclado.hpp"
 
-
+//Função que roda em thread verificando input de teclado e salvando a ultima tecla registrada
 void threadFunction(char *keybuffer, int *control)
 {
   char c;

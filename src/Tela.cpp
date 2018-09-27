@@ -25,11 +25,14 @@ void Tela::init() {
   start_color();
   // Cor de fundo da janela como branco e texto em preto
   init_pair(1, COLOR_BLACK, COLOR_WHITE);
-  erase();
-  wbkgd(this->janelaDeJogo, COLOR_PAIR(1));
-
   // Cor para gerar tanques de outro time
   init_pair(2, COLOR_RED, COLOR_WHITE);
+
+  //Limpa a tela para remover qualquer coisa que tenha
+  erase();
+  //Depois colore a tela com a cor branca
+  wbkgd(this->janelaDeJogo, COLOR_PAIR(1));
+  //E atualiza
   refresh();
 
 }
@@ -41,7 +44,6 @@ void Tela::update() {
 
   // Desenha balas na tela
   std::vector<Bala *> *balas = this->ldb->getBalas();
-
   for (int k=0; k<balas->size(); k++)
   {
     pos = ((*balas)[k]->getPosicao());
@@ -59,9 +61,12 @@ void Tela::update() {
 
     wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
 
+    //Colore o tanque de vermelho se for inimigo e preto se for a gente
     if((*tanques)[k]->getTime() == true){
         wattron(this->janelaDeJogo, COLOR_PAIR(2));
     }
+
+    //Desenha o tanque com setas diferentes dependendo da posição apontada
     char dir = (*tanques)[k]->getDirecao();
     switch (dir) {
         case 'w':

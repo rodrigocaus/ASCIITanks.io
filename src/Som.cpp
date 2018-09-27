@@ -26,6 +26,7 @@ bool Sample::finished() {
   else return false;
 }
 
+//Carrega os samples de audio em um vetor
 void Sample::load(const char *filename) {
   std::string buffer;
   float fdata;
@@ -47,10 +48,12 @@ void Sample::load(const char *filename) {
 
 }
 
+//Posição de onde o som será reproduzido
 unsigned int Sample::get_position() {
   return this->position;
 }
 
+//Posição de onde o som será reproduzido
 void Sample::set_position(unsigned int pos) {
   this->position = pos;
 }
@@ -78,7 +81,7 @@ Sample *Player::get_data() {
   return this->audio_sample;
 }
 
-
+//Função que toca o audio de fato
 int mix_and_play (const void *inputBuffer, void *outputBuffer,
                   unsigned long framesPerBuffer,
                   const PaStreamCallbackTimeInfo* timeInfo,
