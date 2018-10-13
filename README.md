@@ -1,5 +1,5 @@
-# ASCIITanks
-Jogo single-player de tanques produzido na disciplina de EA872.
+# ASCIITanks.io
+Jogo multi-player de tanques produzido na disciplina de EA872.
 Neste jogo o objetivo é sobreviver ao ataque dos tanques que surgem na tela.
 Será que você consegue?
 
@@ -10,10 +10,7 @@ Será que você consegue?
 ## Regras
 
 - O jogador inicia com 3 vidas
-- Os bots possuem uma vida e movimentação aleatória
 - Ser atingido ou colidir com tanques inimigos decresce a sua vida
-
-
 
 ## Instruções
 
