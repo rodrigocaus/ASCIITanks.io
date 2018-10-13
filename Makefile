@@ -1,17 +1,29 @@
 DIR = src/
 HPP := $(wildcard $(DIR)*.hpp)
 SRC := $(wildcard $(DIR)*.cpp)
-EXE = tanks.ea
-FLAGS = -std=c++11 -lncurses -lpthread -lportaudio
+SERVER := $(wildcard $(DIR)server/*.cpp)
+CLIENT := $(wildcard $(DIR)client/*.cpp)
+GAME = tanks.ea
+SPEC = watch.ea
+FLAGS = -std=c++11 -lncurses -lpthread -lportaudio -DAUDIOON
 
 
-all: $(EXE)
+all: $(GAME)
 
-$(EXE): $(SRC) $(HPP)
-	g++ $(SRC) -o $(EXE) $(FLAGS)
+$(GAME): $(SRC) $(HPP) $(SERVER)
+	g++ $(SRC) $(SERVER) -o $(GAME) $(FLAGS)
 
-play: $(EXE)
-	./$(EXE) 2>warning.log
+compilenoaudio: $(SRC) $(HPP) $(SERVER)
+	g++ $(SRC) $(SERVER) -o $(GAME) $(FLAGS) -UAUDIOON
 
-clear: $(EXE)
-	rm $(EXE)
+play: $(GAME)
+	./$(GAME) 2>warning.log
+
+$(SPEC): $(SRC) $(HPP) $(CLIENT)
+	g++ $(SRC) $(CLIENT) -o $(SPEC) $(FLAGS)
+
+spec: $(SPEC)
+	./$(SPEC)
+
+clear:
+	rm -f $(GAME) $(SPEC) warning.log
