@@ -32,6 +32,10 @@ class Bala {
 
   Coordenada getVelocidade();
   Coordenada getPosicao();
+
+  std::string toString() const;
+  friend std::ostream& operator<<(std::ostream& out, const Bala& b);
+
 };
 
 
@@ -63,6 +67,10 @@ class Tanque {
   bool getTime();
 
   Bala *comando(char c);
+
+  std::string toString() const;
+  friend std::ostream& operator<<(std::ostream& out, const Tanque& t);
+
 };
 
 class ListaDeBalas {
@@ -71,10 +79,16 @@ class ListaDeBalas {
 
   public:
     ListaDeBalas();
+	~ListaDeBalas();
     void hardCopy(ListaDeBalas *ldb);
     void addBala(Bala *b);
 	Bala *removeBala(int index);
+	void limpaLista();
     std::vector<Bala *> *getBalas();
+
+	void serializaLista(std::string &buffer_saida);
+	std::vector<Bala *> *deserializaLista(std::string buffer_entrada);
+	Bala& operator[](size_t n);
 };
 
 class ListaDeTanques {
@@ -83,12 +97,18 @@ class ListaDeTanques {
 
   public:
     ListaDeTanques();
+	~ListaDeTanques();
     void hardCopy(ListaDeTanques *ldt);
     void addTanque(Tanque *t);
-    std::vector<Tanque *> *getTanques();
 	Tanque *removeTanque(int index);
+	void limpaLista();
+    std::vector<Tanque *> *getTanques();
 	bool verificaTanquesMortos();
 	void incrementaMunicao();
+
+	void serializaLista(std::string &buffer_saida);
+	std::vector<Tanque *> *deserializaLista(std::string buffer_entrada);
+	Tanque& operator[](size_t n);
 };
 
 #endif

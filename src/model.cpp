@@ -16,7 +16,7 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
   this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
   this->vida = vida;
-  this->balaAtual = 100;
+  this->balaAtual = balaMax;
   this->balaMax = balaMax;
   this->direcao = direcao;
   this->velocidadePadrao = velocidadePadrao;
@@ -133,6 +133,22 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
       return b;
   }
 
+  std::string Tanque::toString() const{
+	  std::string s = "";
+
+	  s += std::to_string((this->velocidade).x) + "," + std::to_string((this->velocidade).y) + ",";
+	  s += std::to_string((this->posicao).x) + "," + std::to_string((this->posicao).y) + ",";
+	  s += std::to_string(this->vida) + "," + std::to_string(this->direcao) + ",";
+	  s += std::to_string(this->balaAtual) + "," + std::to_string(this->balaMax) + ",";
+	  s += std::to_string(this->velocidadePadrao) + "," + std::to_string((int)this->timeInimigo) + "\n";
+
+	  return s;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const Tanque& t) {
+	  return out << t.toString();
+  }
+
 Bala::Bala(Coordenada velocidade, Coordenada posicao) {
   this->velocidade = velocidade;
   this->posicao = posicao;
@@ -170,9 +186,24 @@ Bala::Bala(char direcao, Coordenada posicao , float velocidadePadrao) {
     return posicao;
   }
 
+  std::string Bala::toString() const{
+	  std::string s = "";
+	  s += std::to_string((this->velocidade).x) + "," + std::to_string((this->velocidade).y) + ",";
+	  s += std::to_string((this->posicao).x) + "," + std::to_string((this->posicao).y) + "\n";
+	  return s;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const Bala& b) {
+	  return out << b.toString();
+  }
 
 ListaDeBalas::ListaDeBalas() {
   this->balas = new std::vector<Bala *>(0);
+}
+
+ListaDeBalas::~ListaDeBalas() {
+	this->limpaLista();
+	delete this->balas;
 }
 
   void ListaDeBalas::hardCopy(ListaDeBalas *ldb) {
@@ -194,8 +225,28 @@ ListaDeBalas::ListaDeBalas() {
     return b;
   }
 
+  void ListaDeBalas::limpaLista() {
+	  for (int i = (this->balas)->size(); i > 0; i--) {
+	  	this->removeBala(i - 1);
+	  }
+  }
+
   std::vector<Bala*> *ListaDeBalas::getBalas() {
     return (this->balas);
+  }
+
+  void ListaDeBalas::serializaLista(std::string &buffer_saida) {
+
+  }
+
+  std::vector<Bala *> *ListaDeBalas::deserializaLista(std::string buffer_entrada) {
+
+
+	  return NULL;
+  }
+
+  Bala& ListaDeBalas::operator[](size_t n) {
+	  return (*((*(this->balas))[n]));
   }
 
 
@@ -203,6 +254,10 @@ ListaDeTanques::ListaDeTanques() {
   this->tanques = new std::vector<Tanque *>(0);
 }
 
+ListaDeTanques::~ListaDeTanques() {
+	this->limpaLista();
+	delete this->tanques;
+}
   void ListaDeTanques::hardCopy(ListaDeTanques *ldt) {
     std::vector<Tanque *> *tanques = ldt->getTanques();
 
@@ -225,7 +280,11 @@ ListaDeTanques::ListaDeTanques() {
     (this->tanques)->erase((this->tanques)->begin() + index);
     return t;
   }
-
+  void ListaDeTanques::limpaLista() {
+	  for (int i = (this->tanques)->size(); i > 0; i--) {
+	  	this->removeTanque(i - 1);
+	  }
+  }
   //Verifica tanques que morreram com base na vida. Se 0 ou negativa, morreu, e deleta o tanque.
   bool ListaDeTanques::verificaTanquesMortos() {
     bool alguemMorreu = false;
@@ -243,4 +302,17 @@ ListaDeTanques::ListaDeTanques() {
 	  for (int i = 0; i < this->tanques->size(); i++) {
 		  (*(this->tanques))[i]->updateBala((*(this->tanques))[i]->getBalaAtual() + 1);
       }
+  }
+
+  void ListaDeTanques::serializaLista(std::string &buffer_saida) {
+
+  }
+
+  std::vector<Tanque *> *ListaDeTanques::deserializaLista(std::string buffer_entrada) {
+
+	  return NULL;
+  }
+
+  Tanque& ListaDeTanques::operator[](size_t n) {
+	  return (*((*(this->tanques))[n]));
   }
