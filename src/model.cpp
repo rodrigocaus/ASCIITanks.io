@@ -235,14 +235,33 @@ ListaDeBalas::~ListaDeBalas() {
     return (this->balas);
   }
 
+  /*
+   * Transforma a lista em uma grande string de objetos (toString)
+   */
   void ListaDeBalas::serializaLista(std::string &buffer_saida) {
+	  std::string s = "";
 
+	  for (int i = 0; i < (this->balas)->size(); i++) {
+	  	s += ((*this)[i]).toString();
+	  }
+	  buffer_saida = s;
   }
 
-  std::vector<Bala *> *ListaDeBalas::deserializaLista(std::string buffer_entrada) {
-
-
-	  return NULL;
+  /*
+   * Transforma uma string de objetos (segue a formatação do toString)
+   * e adiciona ao final da lista cada objeto.
+   * Para reconstruir uma lista, é necessário limpá-la antes da deserialização
+   */
+  void ListaDeBalas::deserializaLista(std::string buffer_entrada) {
+	  Coordenada vel;
+	  Coordenada pos;
+	  char *s = (char *)buffer_entrada.c_str();
+	  while (sscanf(s, "%f,%f,%f,%f\n", &(vel.x), &(vel.y), &(pos.x), &(pos.y)) > 0) {
+		  for (; *s != '\n'; s++);
+		  s++;
+		  Bala *novaBala = new Bala(vel, pos);
+		  this->addBala(novaBala);
+	  }
   }
 
   Bala& ListaDeBalas::operator[](size_t n) {
@@ -304,13 +323,48 @@ ListaDeTanques::~ListaDeTanques() {
       }
   }
 
+  /*
+   * Transforma a lista em uma grande string de objetos (toString)
+   */
   void ListaDeTanques::serializaLista(std::string &buffer_saida) {
+	  std::string s = "";
 
+	  for (int i = 0; i < (this->tanques)->size(); i++) {
+	  	s += ((*this)[i]).toString();
+	  }
+	  buffer_saida = s;
   }
 
-  std::vector<Tanque *> *ListaDeTanques::deserializaLista(std::string buffer_entrada) {
-
-	  return NULL;
+  /*
+   * Transforma uma string de objetos (segue a formatação do toString)
+   * e adiciona ao final da lista cada objeto.
+   * Para reconstruir uma lista, é necessário limpá-la antes da deserialização
+   * Problema: o tanque do jogador principal é perdido (nova alocação de Tanque)
+   */
+  void ListaDeTanques::deserializaLista(std::string buffer_entrada) {
+	 Coordenada vel;
+	 Coordenada pos;
+	 int vida;
+	 int direcao;
+	 int balaAtual;
+	 int balaMax;
+	 float velocidadePadrao;
+	 int timeInimigo;
+	 char *s = (char *)buffer_entrada.c_str();
+	 while 	(\
+		 		sscanf(s, "%f,%f,%f,%f,%d,%d,%d,%d,%f,%d\n", \
+				&(vel.x), &(vel.y), &(pos.x), &(pos.y), \
+				&vida, &direcao, &balaAtual, &balaMax, \
+				&velocidadePadrao, &timeInimigo) \
+			> 0)
+	{
+		 for (; *s != '\n'; s++);
+		 s++;
+		 Tanque *novoTanque = new Tanque(pos, vida, balaMax, (char) direcao, velocidadePadrao, (bool) timeInimigo);
+		 novoTanque->updateVelocidade(vel);
+		 novoTanque->updateBala(balaAtual);
+		 this->addTanque(novoTanque);
+	 }
   }
 
   Tanque& ListaDeTanques::operator[](size_t n) {

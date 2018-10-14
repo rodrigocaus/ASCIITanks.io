@@ -8,6 +8,7 @@
 
 #include <chrono>
 #include <cmath>
+#include <cstdio>	// stdio.h
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -87,7 +88,7 @@ class ListaDeBalas {
     std::vector<Bala *> *getBalas();
 
 	void serializaLista(std::string &buffer_saida);
-	std::vector<Bala *> *deserializaLista(std::string buffer_entrada);
+	void deserializaLista(std::string buffer_entrada);
 	Bala& operator[](size_t n);
 };
 
@@ -107,7 +108,7 @@ class ListaDeTanques {
 	void incrementaMunicao();
 
 	void serializaLista(std::string &buffer_saida);
-	std::vector<Tanque *> *deserializaLista(std::string buffer_entrada);
+	void deserializaLista(std::string buffer_entrada);
 	Tanque& operator[](size_t n);
 };
 
