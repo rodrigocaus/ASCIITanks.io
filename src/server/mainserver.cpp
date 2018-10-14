@@ -145,6 +145,18 @@ int main ()
       break;
     }
 
+
+    // Zona de teste de serialização
+    // Buffer de serialização
+    std::string buf;
+    ldb->serializaLista(buf);
+    ldb->limpaLista();
+    ldb->deserializaLista(buf);
+    ldt->serializaLista(buf);
+    ldt->limpaLista();
+    ldt->deserializaLista(buf);
+
+
     // Secção de comandos para os tanques
     // Realiza ações com base no número de ciclos passados
     if (i%25 == 0) {
