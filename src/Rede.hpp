@@ -44,7 +44,7 @@ class Receptor {
         void config();
         void conecta();
         void stop();
-        void receberJogo();
+        void receberJogo(std::string * buf, tamanho);
 }
 
 }

@@ -9,12 +9,12 @@ Tranmissor::Tranmissor() {}
 
 Transmissor::~Transmissor() {}
 
-Transmissor::stop()
+void Transmissor::stop()
 {
 	close(socket_fd);
 }
  
-Transmissor::config() {
+void Transmissor::config() {
 
 	this->client_size = (socklen_t)sizeof(client);
 	
@@ -34,7 +34,7 @@ Transmissor::config() {
 	}
 }
 
-Transmissor::iniciaTransmissao(){
+void Transmissor::iniciaTransmissao(){
 
 	//Servidor aberto para requisição de comunicação
 	listen(socket_fd, 2);
@@ -43,7 +43,7 @@ Transmissor::iniciaTransmissao(){
 	this->connection_fd = accept(socket_fd, (struct sockaddr*)&client, &client_size);
 }
 
-Transmissor::transmitirJogo(std::string sEnvio)
+void Transmissor::transmitirJogo(std::string sEnvio)
 {
 	//Enviando estado de jogo serializado
     if (send(connection_fd, (void *)sEnvios.c_str() , sEnvio.length() + 1 , 0) < 0) {
@@ -55,12 +55,12 @@ Receptor::Receptor() {}
 
 Receptor::~Receptor() {}
 
-Receptor::stop()
+void Receptor::stop()
 {
 	close(socket_fd);
 }
 
-Receptor::config() {
+void Receptor::config() {
 
 	//Socket criado com IPv4 e TCP/IP
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -74,7 +74,7 @@ Receptor::config() {
 	inet_aton("127.0.0.1", &(target.sin_addr));
 }
 
-Receptor::conecta() {
+void Receptor::conecta() {
 
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
@@ -82,9 +82,10 @@ Receptor::conecta() {
     }
 }
 
-Receptor::recebeJogo()
+void Receptor::recebeJogo(std::string * buf, tamanho)
 {
-	//TODO
+	//Recebe o jogo ate o tamanho especificado
+	recv(socket_fd, *buf, tamanho, MSG_WAITALL);
 }
 
 
