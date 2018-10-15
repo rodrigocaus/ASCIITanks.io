@@ -23,5 +23,22 @@ uint64_t get_now_ms() {
 int main ()
 {
 
-  return 0;
+	ListaDeBalas *ldb = new ListaDeBalas();
+	ListaDeTanques *ldt = new ListaDeTanques();
+
+	Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
+  	tela->init();
+
+  	while(1){
+
+
+  	// Atualiza tela
+    tela->update();
+
+  	}
+
+  	tela->stop();
+
+	return 0;
+  	
 }
