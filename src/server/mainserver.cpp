@@ -44,6 +44,11 @@ int main ()
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
 
+  //Inicialização do socket e aguarda contato do cliente
+  Rede::Transmissor * transmissor = new Rede::Transmissor();
+  transmissor->config();
+  transmissor->iniciaTransmissao();
+
   //Inicialização do tanque do jogador e inclusão na lista de tanques
   Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
   ldt->addTanque(meuTanque);
@@ -55,11 +60,6 @@ int main ()
 
   Teclado *teclado = new Teclado();
   teclado->init();
-
-  //Inicialização do socket e aguarda contato do cliente
-  Rede::Transmissor * transmissor = new Rede::Transmissor();
-  transmissor->config();
-  transmissor->iniciaTransmissao();
 
   //Inicialização do primeiro tanque inimigo
   Bot *bot = new Bot(ldt, meuTanque, MAXX - 2);
@@ -152,6 +152,9 @@ int main ()
     }
     if (c == 'q') {
       //Sair do jogo
+
+
+      //TESTE TODO -> ENVIA TAMANHO DA LISTA DE TANQUE NEGATIVA PARA DETERMINAR O ENCERRAMENTO DO JOGO NO SERVER
       break;
     }
 
@@ -187,7 +190,7 @@ int main ()
     //Envia a lista de tanques
     transmissor->transmitirLista(ldtSerial);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     i++;
   }
 

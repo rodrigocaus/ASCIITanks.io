@@ -41,11 +41,14 @@ int main ()
   	//Strings das listas serializadas
   	std::string ldbSerial , ldtSerial;
 
+  	std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
 
-  	while(1){
+  	while(ldtTam >= 0){
 
   	//Recebe os tamanhos das listas
   	receptor->receberTamanho(&ldbTam , &ldtTam);
+
+  	std::cerr << "Tamanho recebido ldbTam= " << ldbTam << "ldtTam= " << ldtTam << "\n";
 
   	ldb->limpaLista();
   	ldt->limpaLista();
@@ -54,6 +57,8 @@ int main ()
 
   	receptor->receberLista(ldbSerial , ldbTam);
   	receptor->receberLista(ldtSerial , ldtTam);
+
+  	std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
 
   	ldb->deserializaLista(ldbSerial);
   	ldt->deserializaLista(ldtSerial);

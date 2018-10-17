@@ -54,7 +54,7 @@ void Transmissor::transmitirLista(std::string & sEnvio)
     if (send(connection_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
       std::cerr << "Erro ao enviar mensagem das listas\n";
     } else {
-      //std::cerr << "Lista serializada eniada\n";
+      std::cerr << "Lista serializada eniada\n";
     }
 }
 
@@ -64,7 +64,7 @@ void Transmissor::transmitirTamanho(size_t * tamListas)
     if (send(connection_fd, (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
       std::cerr << "Erro ao enviar mensagem de tamanhos\n";
     } else {
-     // std::cerr << "Tamanho enviado\n";
+      std::cerr << "Tamanho enviado\n";
     }
 }
 
@@ -103,11 +103,18 @@ void Receptor::conecta() {
 
 void Receptor::receberLista(std::string & buf, size_t tamanho)
 {
-    char *auxbuf = (char *)calloc(tamanho,sizeof(char));
-	//Recebe o jogo ate o tamanho especificado
-	recv(socket_fd, (void *)auxbuf, tamanho, MSG_WAITALL);
-    buf = auxbuf;
-    free(auxbuf);
+	if(tamanho > 0){
+		
+	    char *auxbuf = (char *)calloc(tamanho,sizeof(char));
+		//Recebe o jogo ate o tamanho especificado
+		if((recv(socket_fd, (void *)auxbuf, tamanho, MSG_WAITALL))>0){
+			std::cerr << "Recebi lista com sucesso\n";
+		} else {
+			std::cerr << "Erro ao receber lista\n";
+		}
+	    buf = auxbuf;
+	    free(auxbuf);
+	}
 }
 
 void Receptor::receberTamanho(size_t * ldbTam , size_t * ldtTam)
@@ -115,7 +122,11 @@ void Receptor::receberTamanho(size_t * ldbTam , size_t * ldtTam)
 
 	size_t tamListas[2] = {0,0};
 	//Recebe o tamanho das listas serializadas
-	recv(socket_fd, (void*)tamListas, 2*sizeof(size_t), MSG_WAITALL);
+	if((recv(socket_fd, (void*)tamListas, 2*sizeof(size_t), MSG_WAITALL))>0){
+		std::cerr << "Recebi tamanho com sucesso\n";
+	} else {
+		std::cerr << "Erro ao receber tamanho\n";
+	}
 
 	*ldbTam = tamListas[0];
 	*ldtTam = tamListas[1];
