@@ -27,8 +27,8 @@ int main ()
 	ListaDeBalas *ldb = new ListaDeBalas();
 	ListaDeTanques *ldt = new ListaDeTanques();
 
-	Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
-  	tela->init();
+	//Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
+  	//tela->init();
 
   	//Cria o objeto responsável por receber o estado de jogo da rede
   	Rede::Receptor * receptor = new Rede::Receptor();
@@ -52,18 +52,18 @@ int main ()
   	ldbSerial.clear();
   	ldtSerial.clear();
 
-  	receptor->receberLista(&ldbSerial , ldbTam);
-  	receptor->receberLista(&ldtSerial , ldtTam);
+  	receptor->receberLista(ldbSerial , ldbTam);
+  	receptor->receberLista(ldtSerial , ldtTam);
 
   	ldb->deserializaLista(ldbSerial);
   	ldt->deserializaLista(ldtSerial);
 
   	// Atualiza tela
-    tela->update();
+    //tela->update();
 
   	}
 
-  	tela->stop();
+  	//tela->stop();
   	receptor->stop();
 
 	return 0;

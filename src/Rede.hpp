@@ -30,7 +30,7 @@ class Transmissor {
         void config();
         void iniciaTransmissao();
         void stop();
-        void transmitirLista(std::string sEnvio);
+        void transmitirLista(std::string & sEnvio);
         void transmitirTamanho(size_t * tamListas);
 };
 
@@ -47,7 +47,7 @@ class Receptor {
         void config();
         void conecta();
         void stop();
-        void receberLista(std::string * buf, size_t tamanho);
+        void receberLista(std::string & buf, size_t tamanho);
         void receberTamanho(size_t * ldbTam , size_t * ldtTam);
 };
 

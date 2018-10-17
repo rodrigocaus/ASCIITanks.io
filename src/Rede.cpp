@@ -48,10 +48,10 @@ void Transmissor::iniciaTransmissao(){
 	std::cerr << "Recebi uma conexao\n";
 }
 
-void Transmissor::transmitirLista(std::string sEnvio)
+void Transmissor::transmitirLista(std::string & sEnvio)
 {
 	//Enviando estado de jogo serializado
-    if (send(connection_fd, (void *)sEnvio.c_str() , sEnvio.length() + 1 , 0) < 0) {
+    if (send(connection_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
       std::cerr << "Erro ao enviar mensagem das listas\n";
     } else {
       //std::cerr << "Lista serializada eniada\n";
@@ -101,10 +101,13 @@ void Receptor::conecta() {
     }
 }
 
-void Receptor::receberLista(std::string * buf, size_t tamanho)
+void Receptor::receberLista(std::string & buf, size_t tamanho)
 {
+    char *auxbuf = (char *)calloc(tamanho,sizeof(char));
 	//Recebe o jogo ate o tamanho especificado
-	recv(socket_fd, (void *)buf, tamanho, MSG_WAITALL);
+	recv(socket_fd, (void *)auxbuf, tamanho, MSG_WAITALL);
+    buf = auxbuf;
+    free(auxbuf);
 }
 
 void Receptor::receberTamanho(size_t * ldbTam , size_t * ldtTam)
