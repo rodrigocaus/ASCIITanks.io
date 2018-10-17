@@ -15,14 +15,14 @@ void Transmissor::stop()
 {
 	close(socket_fd);
 }
- 
+
 void Transmissor::config() {
 
 	this->client_size = (socklen_t)sizeof(client);
-	
+
 	//Socket criado com IPv4 e TCP/IP
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-	
+
 	//Configurando o meu socket para IPv4 e porta 3001
 	myself.sin_family = AF_INET;
 	myself.sin_port = htons(3001);
@@ -107,7 +107,7 @@ void Receptor::receberLista(std::string & buf, size_t tamanho)
 {
 	if(tamanho > 0){
 
-	    char *auxbuf = (char *)calloc(tamanho,sizeof(char));
+	    char *auxbuf = (char *)calloc(tamanho+1,sizeof(char));
 		//Recebe o jogo ate o tamanho especificado
 		if((recv(socket_fd, (void *)auxbuf, tamanho, MSG_WAITALL))>0){
 			//std::cerr << "Recebi lista com sucesso\n";
@@ -133,6 +133,3 @@ void Receptor::receberTamanho(size_t * ldbTam , size_t * ldtTam)
 	*ldbTam = tamListas[0];
 	*ldtTam = tamListas[1];
 }
-
-
-
