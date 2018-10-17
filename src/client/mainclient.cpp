@@ -27,8 +27,8 @@ int main ()
 	ListaDeBalas *ldb = new ListaDeBalas();
 	ListaDeTanques *ldt = new ListaDeTanques();
 
-	//Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
-  	//tela->init();
+	Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
+  	tela->init();
 
   	//Cria o objeto responsável por receber o estado de jogo da rede
   	Rede::Receptor * receptor = new Rede::Receptor();
@@ -41,35 +41,37 @@ int main ()
   	//Strings das listas serializadas
   	std::string ldbSerial , ldtSerial;
 
-  	std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
+  	//std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
 
-  	while(ldtTam >= 0){
+  	while(1){
 
-  	//Recebe os tamanhos das listas
-  	receptor->receberTamanho(&ldbTam , &ldtTam);
+	  	//Recebe os tamanhos das listas
+	  	receptor->receberTamanho(&ldbTam , &ldtTam);
+	  	if(ldtTam < 1) break;
 
-  	std::cerr << "Tamanho recebido ldbTam= " << ldbTam << "ldtTam= " << ldtTam << "\n";
+	  	//std::cerr << "Tamanho recebido ldbTam= " << ldbTam << "ldtTam= " << ldtTam << "\n";
 
-  	ldb->limpaLista();
-  	ldt->limpaLista();
-  	ldbSerial.clear();
-  	ldtSerial.clear();
+	  	ldb->limpaLista();
+	  	ldt->limpaLista();
+	  	ldbSerial.clear();
+	  	ldtSerial.clear();
 
-  	receptor->receberLista(ldbSerial , ldbTam);
-  	receptor->receberLista(ldtSerial , ldtTam);
+	  	receptor->receberLista(ldbSerial , ldbTam);
+	  	receptor->receberLista(ldtSerial , ldtTam);
 
-  	std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
+	  	//std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
 
-  	ldb->deserializaLista(ldbSerial);
-  	ldt->deserializaLista(ldtSerial);
+	  	ldb->deserializaLista(ldbSerial);
+	  	ldt->deserializaLista(ldtSerial);
 
-  	// Atualiza tela
-    //tela->update();
+	  	// Atualiza tela
+	    tela->update();
 
   	}
 
-  	//tela->stop();
+  	tela->stop();
   	receptor->stop();
+  	std::cerr << "Matou o programa\n";
 
 	return 0;
   	

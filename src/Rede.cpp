@@ -9,7 +9,7 @@ using namespace Rede;
 
 Transmissor::Transmissor() {}
 
-Transmissor::~Transmissor() {}
+Transmissor::~Transmissor() { this->stop();}
 
 void Transmissor::stop()
 {
@@ -50,12 +50,14 @@ void Transmissor::iniciaTransmissao(){
 
 void Transmissor::transmitirLista(std::string & sEnvio)
 {
-	//Enviando estado de jogo serializado
-    if (send(connection_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
-      std::cerr << "Erro ao enviar mensagem das listas\n";
-    } else {
-      std::cerr << "Lista serializada eniada\n";
-    }
+	if(sEnvio.length() > 0){
+		//Enviando estado de jogo serializado
+	    if (send(connection_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
+	      std::cerr << "Erro ao enviar mensagem das listas\n";
+	    } else {
+	      //std::cerr << "Lista serializada eniada\n";
+	    }
+	}
 }
 
 void Transmissor::transmitirTamanho(size_t * tamListas)
@@ -64,13 +66,13 @@ void Transmissor::transmitirTamanho(size_t * tamListas)
     if (send(connection_fd, (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
       std::cerr << "Erro ao enviar mensagem de tamanhos\n";
     } else {
-      std::cerr << "Tamanho enviado\n";
+      //std::cerr << "Tamanho enviado\n";
     }
 }
 
 Receptor::Receptor() {}
 
-Receptor::~Receptor() {}
+Receptor::~Receptor() { this->stop();}
 
 void Receptor::stop()
 {
@@ -104,11 +106,11 @@ void Receptor::conecta() {
 void Receptor::receberLista(std::string & buf, size_t tamanho)
 {
 	if(tamanho > 0){
-		
+
 	    char *auxbuf = (char *)calloc(tamanho,sizeof(char));
 		//Recebe o jogo ate o tamanho especificado
 		if((recv(socket_fd, (void *)auxbuf, tamanho, MSG_WAITALL))>0){
-			std::cerr << "Recebi lista com sucesso\n";
+			//std::cerr << "Recebi lista com sucesso\n";
 		} else {
 			std::cerr << "Erro ao receber lista\n";
 		}
@@ -123,7 +125,7 @@ void Receptor::receberTamanho(size_t * ldbTam , size_t * ldtTam)
 	size_t tamListas[2] = {0,0};
 	//Recebe o tamanho das listas serializadas
 	if((recv(socket_fd, (void*)tamListas, 2*sizeof(size_t), MSG_WAITALL))>0){
-		std::cerr << "Recebi tamanho com sucesso\n";
+		//std::cerr << "Recebi tamanho com sucesso\n";
 	} else {
 		std::cerr << "Erro ao receber tamanho\n";
 	}

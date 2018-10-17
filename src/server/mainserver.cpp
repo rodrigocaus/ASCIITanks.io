@@ -107,7 +107,10 @@ int main ()
         player->play(somGameOver);
 #endif
         //Espera o som acabar antes de encerrar o jogo
+        size_t tamListas[2] = {0,0};
+        transmissor->transmitirTamanho(tamListas);
         tSom0 = get_now_ms();
+        
         while (1) {
           std::this_thread::sleep_for (std::chrono::milliseconds(10));
           tSom1 = get_now_ms();
@@ -153,8 +156,11 @@ int main ()
     if (c == 'q') {
       //Sair do jogo
 
+      //TESTE
 
-      //TESTE TODO -> ENVIA TAMANHO DA LISTA DE TANQUE NEGATIVA PARA DETERMINAR O ENCERRAMENTO DO JOGO NO SERVER
+      size_t tamListas[2] = {0,0};
+      transmissor->transmitirTamanho(tamListas);
+      std::this_thread::sleep_for(std::chrono::milliseconds(600));
       break;
     }
 
@@ -190,7 +196,7 @@ int main ()
     //Envia a lista de tanques
     transmissor->transmitirLista(ldtSerial);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
     i++;
   }
 
