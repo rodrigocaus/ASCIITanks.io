@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <string>
+#include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -28,7 +30,8 @@ class Transmissor {
         void config();
         void iniciaTransmissao();
         void stop();
-        void transmitirJogo(std::string sEnvio);
+        void transmitirLista(std::string sEnvio);
+        void transmitirTamanho(size_t * tamListas);
 };
 
 
@@ -44,8 +47,9 @@ class Receptor {
         void config();
         void conecta();
         void stop();
-        void receberJogo(std::string * buf, tamanho);
-}
+        void receberLista(std::string * buf, size_t tamanho);
+        void receberTamanho(size_t * ldbTam , size_t * ldtTam);
+};
 
 }
 #endif

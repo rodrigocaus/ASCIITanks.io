@@ -9,6 +9,7 @@
 #include "../Fisica.hpp"
 #include "../Tela.hpp"
 #include "../Bot.hpp"
+#include "../Rede.hpp"
 
 //Tamanho da janela de jogo
 #define MAXX 30
@@ -55,6 +56,11 @@ int main ()
   Teclado *teclado = new Teclado();
   teclado->init();
 
+  //Inicialização do socket e aguarda contato do cliente
+  Rede::Transmissor * transmissor = new Rede::Transmissor();
+  transmissor->config();
+  transmissor->iniciaTransmissao();
+
   //Inicialização do primeiro tanque inimigo
   Bot *bot = new Bot(ldt, meuTanque, MAXX - 2);
 
@@ -66,6 +72,10 @@ int main ()
   int i = 0;
   int minhaVidaAntes = 0;
   int minhaVidaAgora = 0;
+
+  //String que receberá a serialização das listas de balas e tanques
+  std::string ldbSerial;
+  std::string ldtSerial;
 
   t1 = get_now_ms();
 
@@ -145,18 +155,6 @@ int main ()
       break;
     }
 
-
-    // Zona de teste de serialização
-    // Buffer de serialização
-    std::string buf;
-    ldb->serializaLista(buf);
-    ldb->limpaLista();
-    ldb->deserializaLista(buf);
-    ldt->serializaLista(buf);
-    ldt->limpaLista();
-    ldt->deserializaLista(buf);
-
-
     // Secção de comandos para os tanques
     // Realiza ações com base no número de ciclos passados
     if (i%25 == 0) {
@@ -172,6 +170,23 @@ int main ()
         ldt->addTanque(bot->spawn()); //Novo tanque inimigo criado
         i = 0;
     }
+
+    //Secção de serialização das listas e envio para a rede
+    ldb->serializaLista(ldbSerial);
+    ldt->serializaLista(ldtSerial);
+
+    //Tamanho das listas geradas
+    size_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
+
+    //Envia os tamanhos das listas para o cliente saber o quanto deve receber
+    transmissor->transmitirTamanho(tamListas);
+
+    //Envia a lista de balas
+    transmissor->transmitirLista(ldbSerial);
+
+    //Envia a lista de tanques
+    transmissor->transmitirLista(ldtSerial);
+
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     i++;
   }
@@ -182,6 +197,7 @@ int main ()
 #endif
   tela->stop();
   teclado->stop();
+  transmissor->stop();
 
   return 0;
 }
