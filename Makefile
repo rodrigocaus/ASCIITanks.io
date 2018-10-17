@@ -17,13 +17,13 @@ compilenoaudio: $(SRC) $(HPP) $(SERVER)
 	g++ $(SRC) $(SERVER) -o $(GAME) $(FLAGS) -UAUDIOON
 
 play: $(GAME)
-	./$(GAME) 2>warning.log
+	./$(GAME) 2>serverLog.log
 
 $(SPEC): $(SRC) $(HPP) $(CLIENT)
 	g++ $(SRC) $(CLIENT) -o $(SPEC) $(FLAGS)
 
 spec: $(SPEC)
-	./$(SPEC)
+	./$(SPEC) 2>specLog.log
 
 clear:
 	rm -f $(GAME) $(SPEC) warning.log
