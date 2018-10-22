@@ -7,16 +7,16 @@
 
 using namespace Rede;
 
-Transmissor::Transmissor() {}
+Servidor::Servidor() {}
 
-Transmissor::~Transmissor() { this->stop();}
+Servidor::~Servidor() { this->stop();}
 
-void Transmissor::stop()
+void Servidor::stop()
 {
 	close(socket_fd);
 }
 
-void Transmissor::config() {
+void Servidor::config() {
 
 	this->client_size = (socklen_t)sizeof(client);
 
@@ -36,7 +36,7 @@ void Transmissor::config() {
 	}
 }
 
-void Transmissor::iniciaTransmissao(){
+void Servidor::iniciaTransmissao(){
 
 	//Servidor aberto para requisição de comunicação
 	listen(socket_fd, 2);
@@ -48,7 +48,7 @@ void Transmissor::iniciaTransmissao(){
 	std::cerr << "Recebi uma conexao\n";
 }
 
-void Transmissor::transmitirLista(std::string & sEnvio)
+void Servidor::transmitirLista(std::string & sEnvio)
 {
 	if(sEnvio.length() > 0){
 		//Enviando estado de jogo serializado
@@ -60,7 +60,7 @@ void Transmissor::transmitirLista(std::string & sEnvio)
 	}
 }
 
-void Transmissor::transmitirTamanho(size_t * tamListas)
+void Servidor::transmitirTamanho(size_t * tamListas)
 {
 	//Enviando o tamanho das listas
     if (send(connection_fd, (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
@@ -70,16 +70,25 @@ void Transmissor::transmitirTamanho(size_t * tamListas)
     }
 }
 
-Receptor::Receptor() {}
+void Servidor::receberComando(char * c)
+{
+	char comando;
+	if((recv(connection_fd, &comando , 1, 0))<=0){
+		std::cerr << "Erro ao receber comando do cliente\n";
+	}
+	*c = comando;
+}
 
-Receptor::~Receptor() { this->stop();}
+Cliente::Cliente() {}
 
-void Receptor::stop()
+Cliente::~Cliente() { this->stop();}
+
+void Cliente::stop()
 {
 	close(socket_fd);
 }
 
-void Receptor::config() {
+void Cliente::config() {
 
 	//Socket criado com IPv4 e TCP/IP
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -92,7 +101,7 @@ void Receptor::config() {
 	inet_aton("127.0.0.1", &(target.sin_addr));
 }
 
-void Receptor::conecta() {
+void Cliente::conecta() {
 
 	//Estabelece a conexão
 	std::cerr << "tentando conectar\n";
@@ -103,7 +112,7 @@ void Receptor::conecta() {
     }
 }
 
-void Receptor::receberLista(std::string & buf, size_t tamanho)
+void Cliente::receberLista(std::string & buf, size_t tamanho)
 {
 	if(tamanho > 0){
 
@@ -119,7 +128,7 @@ void Receptor::receberLista(std::string & buf, size_t tamanho)
 	}
 }
 
-void Receptor::receberTamanho(size_t * ldbTam , size_t * ldtTam)
+void Cliente::receberTamanho(size_t * ldbTam , size_t * ldtTam)
 {
 
 	size_t tamListas[2] = {0,0};
@@ -132,4 +141,11 @@ void Receptor::receberTamanho(size_t * ldbTam , size_t * ldtTam)
 
 	*ldbTam = tamListas[0];
 	*ldtTam = tamListas[1];
+}
+
+void Cliente::enviarComando(char c)
+{
+	if (send(socket_fd, &c , sizeof(char) , 0) < 0) {
+      std::cerr << "Erro ao enviar comando ao servidor\n";
+    }
 }

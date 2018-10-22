@@ -17,7 +17,7 @@
 
 namespace Rede {
 
-class Transmissor {
+class Servidor {
 
     private:
         int socket_fd, connection_fd;
@@ -25,30 +25,32 @@ class Transmissor {
         socklen_t client_size;
 
     public:
-        Transmissor();
-        ~Transmissor();
+        Servidor();
+        ~Servidor();
         void config();
         void iniciaTransmissao();
         void stop();
         void transmitirLista(std::string & sEnvio);
         void transmitirTamanho(size_t * tamListas);
+        void receberComando(char * c);
 };
 
 
-class Receptor {
+class Cliente {
 
     private:
         int socket_fd;
         struct sockaddr_in target;
 
     public:
-        Receptor();
-        ~Receptor();
+        Cliente();
+        ~Cliente();
         void config();
         void conecta();
         void stop();
         void receberLista(std::string & buf, size_t tamanho);
         void receberTamanho(size_t * ldbTam , size_t * ldtTam);
+        void enviarComando(char c);
 };
 
 }

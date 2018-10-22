@@ -4,12 +4,10 @@
  */
 
 #include "../model.hpp"
-#include "../Som.hpp"
-#include "../Teclado.hpp"
 #include "../Fisica.hpp"
-#include "../Tela.hpp"
 #include "../Bot.hpp"
 #include "../Rede.hpp"
+#include "../Teclado.hpp"
 
 //Tamanho da janela de jogo
 #define MAXX 30
@@ -23,43 +21,21 @@ uint64_t get_now_ms() {
 
 int main ()
 {
-#ifdef AUDIOON
-  //Cria objetos de audio e importa os sons que serão usados no jogo
-  Audio::Sample *somFight = new Audio::Sample();
-  somFight->load("assets/fight.dat");
-  Audio::Sample *somTiro = new Audio::Sample();
-  somTiro->load("assets/tiro.dat");
-  Audio::Sample *somBoom = new Audio::Sample();
-  somBoom->load("assets/boom.dat");
-  Audio::Sample *somHit = new Audio::Sample();
-  somHit->load("assets/hit.dat");
-  Audio::Sample *somGameOver = new Audio::Sample();
-  somGameOver->load("assets/gameOver.dat");
 
-  //Cria o objeto de tocador de audio e inicia com o som "Fight !"
-  Audio::Player *player = new Audio::Player();
-  player->init();
-  player->play(somFight);
-#endif
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
 
   //Inicialização do socket e aguarda contato do cliente
-  Rede::Transmissor * transmissor = new Rede::Transmissor();
-  transmissor->config();
-  transmissor->iniciaTransmissao();
+  Rede::Servidor * servidor = new Rede::Servidor();
+  servidor->config();
+  servidor->iniciaTransmissao();
 
   //Inicialização do tanque do jogador e inclusão na lista de tanques
   Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
   ldt->addTanque(meuTanque);
 
-  Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
-  tela->init();
-
+  //Inicialização do modelo físico
   Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
-
-  Teclado *teclado = new Teclado();
-  teclado->init();
 
   //Inicialização do primeiro tanque inimigo
   Bot *bot = new Bot(ldt, meuTanque, MAXX - 2);
@@ -67,20 +43,17 @@ int main ()
   uint64_t t0;
   uint64_t t1;
   uint64_t deltaT;
-  uint64_t tSom0, tSom1;
   bool alguemMorreu = false;
   int i = 0;
   int minhaVidaAntes = 0;
   int minhaVidaAgora = 0;
+  char c;
 
   //String que receberá a serialização das listas de balas e tanques
   std::string ldbSerial;
   std::string ldtSerial;
 
   t1 = get_now_ms();
-
-  //Limpa eventuais comandos pre-buffered
-  teclado->getChar();
 
   while (1) {
     // Atualiza timers
@@ -92,8 +65,6 @@ int main ()
     minhaVidaAntes = meuTanque->getVida();
     // Atualiza modelo
     f->update(deltaT);
-    // Atualiza tela
-    tela->update();
     //Vida após a atualização do modelo
     minhaVidaAgora = meuTanque->getVida();
 
@@ -101,66 +72,42 @@ int main ()
     if(minhaVidaAgora <= 0) {
         //Game Over
 
-        //Toca som de game over
-#ifdef AUDIOON
-        player->pause();
-        player->play(somGameOver);
-#endif
-        //Espera o som acabar antes de encerrar o jogo
+        //Envia tam da lista de tanques como zero, indincando que o jogo acabou
         size_t tamListas[2] = {0,0};
-        transmissor->transmitirTamanho(tamListas);
-        tSom0 = get_now_ms();
+        servidor->transmitirTamanho(tamListas);
         
-        while (1) {
-          std::this_thread::sleep_for (std::chrono::milliseconds(10));
-          tSom1 = get_now_ms();
-          if (tSom1-tSom0 > 1700) break;
-        }
         break;
     } //Verifica se levou dano
-    else if(minhaVidaAgora < minhaVidaAntes)
-    {
 
-        //Toca som de hit
-#ifdef AUDIOON
-        player->pause();
-        somHit->set_position(0);
-        player->play(somHit);
-#endif
-    }
+    //Secção de serialização das listas e envio para a rede
+    ldb->serializaLista(ldbSerial);
+    ldt->serializaLista(ldtSerial);
 
-    //Verifica se os tanques inimigos morreram e produz som
-    alguemMorreu = ldt->verificaTanquesMortos();
-    if(alguemMorreu){
-#ifdef AUDIOON
-      player->pause();
-      somBoom->set_position(0);
-      player->play(somBoom);
-#endif
-      alguemMorreu = false;
-    }
+    //Tamanho das listas geradas
+    size_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
 
-    // Lê o teclado
-    char c = teclado->getChar();
+    //Envia os tamanhos das listas para o cliente saber o quanto deve receber
+    servidor->transmitirTamanho(tamListas);
+
+    //Envia a lista de balas
+    servidor->transmitirLista(ldbSerial);
+
+    //Envia a lista de tanques
+    servidor->transmitirLista(ldtSerial);
+
+    //Recebe comando do cliente
+    servidor->receberComando(&c);
 
     //Se houve uma bala gerada, reproduz som de tiro
     Bala *novaBala = meuTanque->comando(c);
     if(novaBala != NULL){
-#ifdef AUDIOON
-        player->pause();
-        somTiro->set_position(0);
-        player->play(somTiro);
-#endif
-        ldb->addBala(novaBala);
+      ldb->addBala(novaBala);
     }
     if (c == 'q') {
       //Sair do jogo
 
-      //TESTE
-
       size_t tamListas[2] = {0,0};
-      transmissor->transmitirTamanho(tamListas);
-      std::this_thread::sleep_for(std::chrono::milliseconds(600));
+      servidor->transmitirTamanho(tamListas);
       break;
     }
 
@@ -180,33 +127,13 @@ int main ()
         i = 0;
     }
 
-    //Secção de serialização das listas e envio para a rede
-    ldb->serializaLista(ldbSerial);
-    ldt->serializaLista(ldtSerial);
-
-    //Tamanho das listas geradas
-    size_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
-
-    //Envia os tamanhos das listas para o cliente saber o quanto deve receber
-    transmissor->transmitirTamanho(tamListas);
-
-    //Envia a lista de balas
-    transmissor->transmitirLista(ldbSerial);
-
-    //Envia a lista de tanques
-    transmissor->transmitirLista(ldtSerial);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
     i++;
   }
 
   //Encerra o programa
-#ifdef AUDIOON
-  player->stop();
-#endif
-  tela->stop();
-  teclado->stop();
-  transmissor->stop();
+  servidor->stop();
 
   return 0;
 }
+

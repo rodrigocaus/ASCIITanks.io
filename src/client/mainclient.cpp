@@ -30,10 +30,17 @@ int main ()
 	Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
   	tela->init();
 
+  	//Inicializa o teclado
+  	Teclado *teclado = new Teclado();
+	teclado->init();
+
+	//Limpa eventuais comandos pre-buffered
+	teclado->getChar();
+
   	//Cria o objeto responsável por receber o estado de jogo da rede
-  	Rede::Receptor * receptor = new Rede::Receptor();
-  	receptor->config();
-  	receptor->conecta();
+  	Rede::Cliente * cliente = new Rede::Cliente();
+  	cliente->config();
+  	cliente->conecta();
 
   	//Tamanhos das listas a serem desserializadas
   	size_t ldbTam , ldtTam;
@@ -41,36 +48,37 @@ int main ()
   	//Strings das listas serializadas
   	std::string ldbSerial , ldtSerial;
 
-  	//std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
-
   	while(1){
 
 	  	//Recebe os tamanhos das listas
-	  	receptor->receberTamanho(&ldbTam , &ldtTam);
-	  	if(ldtTam < 1) break;
+	  	cliente->receberTamanho(&ldbTam , &ldtTam);
+	  	if(ldtTam < 1) break; //Encerra o programa se não houver mais tanques (jogador morreu)
 
-	  	//std::cerr << "Tamanho recebido ldbTam= " << ldbTam << "ldtTam= " << ldtTam << "\n";
-
+	  	//Zera as srings de serial e as listas de tanques e balas, para receber as novas
 	  	ldb->limpaLista();
 	  	ldt->limpaLista();
 	  	ldbSerial.clear();
 	  	ldtSerial.clear();
 
-	  	receptor->receberLista(ldbSerial , ldbTam);
-	  	receptor->receberLista(ldtSerial , ldtTam);
+	  	//Recebe as novas listas de balas e tanques de forma serial
+	  	cliente->receberLista(ldbSerial , ldbTam);
+	  	cliente->receberLista(ldtSerial , ldtTam);
 
-	  	//std::cerr << "tamanho ldbSerial= " << ldbSerial.length() << "tamanho ldbSerial= " << ldtSerial.length() << "\n";
+	  	// Lê o teclado e envia o comando ao servidor
+		char c = teclado->getChar();
+		cliente->enviarComando(c);
 
+	  	//Deserializa as listas para criar os novos objetos de lista
 	  	ldb->deserializaLista(ldbSerial);
 	  	ldt->deserializaLista(ldtSerial);
 
 	  	// Atualiza tela
 	    tela->update();
-
   	}
 
   	tela->stop();
-  	receptor->stop();
+  	teclado->stop();
+  	cliente->stop();
   	std::cerr << "Matou o programa\n";
 
 	return 0;
