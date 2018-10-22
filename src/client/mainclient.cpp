@@ -27,6 +27,7 @@ int main ()
 	ListaDeBalas *ldb = new ListaDeBalas();
 	ListaDeTanques *ldt = new ListaDeTanques();
 
+	//Inicializa a tela
 	Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
   	tela->init();
 

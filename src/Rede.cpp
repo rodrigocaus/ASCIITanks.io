@@ -13,6 +13,7 @@ Servidor::~Servidor() { this->stop();}
 
 void Servidor::stop()
 {
+	close(connection_fd);
 	close(socket_fd);
 }
 

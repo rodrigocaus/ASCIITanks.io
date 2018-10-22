@@ -77,7 +77,9 @@ int main ()
         servidor->transmitirTamanho(tamListas);
         
         break;
-    } //Verifica se levou dano
+    } 
+    //Verifica se levou dano
+    ldt->verificaTanquesMortos();
 
     //Secção de serialização das listas e envio para a rede
     ldb->serializaLista(ldbSerial);
