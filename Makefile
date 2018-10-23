@@ -1,29 +1,33 @@
 DIR = src/
-HPP := $(wildcard $(DIR)*.hpp)
-SRC := $(wildcard $(DIR)*.cpp)
-SERVER := $(wildcard $(DIR)server/*.cpp)
-CLIENT := $(wildcard $(DIR)client/*.cpp)
+SERVER_HPP = $(DIR)model.hpp $(DIR)Fisica.hpp $(DIR)Bot.hpp $(DIR)Rede.hpp
+CLIENT_HPP = $(DIR)model.hpp $(DIR)Rede.hpp $(DIR)Teclado.hpp $(DIR)Tela.hpp $(DIR)Som.hpp
+SERVER_SRC = $(DIR)model.cpp $(DIR)Fisica.cpp $(DIR)Bot.cpp $(DIR)Rede.cpp
+CLIENT_SRC = $(DIR)model.cpp $(DIR)Rede.cpp $(DIR)Teclado.cpp $(DIR)Tela.cpp $(DIR)Som.cpp
+SERVER_MAIN := $(wildcard $(DIR)server/*.cpp)
+CLIENT_MAIN := $(wildcard $(DIR)client/*.cpp)
+
 GAME = tanks.ea
-SPEC = watch.ea
+SERVER = server.ea
+
 FLAGS = -std=c++11 -lncurses -lpthread -lportaudio -DAUDIOON
 
 
 all: $(GAME)
 
-$(GAME): $(SRC) $(HPP) $(SERVER)
-	g++ $(SRC) $(SERVER) -o $(GAME) $(FLAGS)
+$(GAME): $(CLIENT_HPP) $(CLIENT_SRC) $(CLIENT_MAIN)
+	g++ $(CLIENT_SRC) $(CLIENT_MAIN) -o $(GAME) $(FLAGS)
 
-compilenoaudio: $(SRC) $(HPP) $(SERVER)
-	g++ $(SRC) $(SERVER) -o $(GAME) $(FLAGS) -UAUDIOON
+noaudio: $(CLIENT_HPP) $(CLIENT_SRC) $(CLIENT_MAIN)
+	g++ $(CLIENT_SRC) $(CLIENT_MAIN) -o $(GAME) $(FLAGS) -UAUDIOON
 
 play: $(GAME)
-	./$(GAME) 2>serverLog.log
+	./$(GAME) 2>game.log
 
-$(SPEC): $(SRC) $(HPP) $(CLIENT)
-	g++ $(SRC) $(CLIENT) -o $(SPEC) $(FLAGS)
+$(SERVER): $(SERVER_HPP) $(SERVER_SRC) $(SERVER_MAIN)
+	g++ $(SERVER_SRC) $(SERVER_MAIN) -o $(SERVER) $(FLAGS)
 
-spec: $(SPEC)
-	./$(SPEC) 2>specLog.log
+server: $(SERVER)
+	./$(SERVER) 2>server.log
 
 clear:
-	rm -f $(GAME) $(SPEC) warning.log
+	rm -f $(GAME) $(SERVER) game.log server.log
