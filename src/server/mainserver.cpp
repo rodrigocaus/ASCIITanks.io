@@ -7,7 +7,6 @@
 #include "../Fisica.hpp"
 #include "../Bot.hpp"
 #include "../Rede.hpp"
-#include "../Teclado.hpp"
 
 //Tamanho da janela de jogo
 #define MAXX 30
@@ -37,7 +36,7 @@ int main ()
   //Inicialização do modelo físico
   Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
 
-  //Inicialização do primeiro tanque inimigo
+  //Inicialização do gerenciador de bots
   Bot *bot = new Bot(ldt, meuTanque, MAXX - 2);
 
   uint64_t t0;
@@ -75,9 +74,9 @@ int main ()
         //Envia tam da lista de tanques como zero, indincando que o jogo acabou
         size_t tamListas[2] = {0,0};
         servidor->transmitirTamanho(tamListas);
-        
+
         break;
-    } 
+    }
     //Verifica se levou dano
     ldt->verificaTanquesMortos();
 
@@ -129,7 +128,7 @@ int main ()
         i = 0;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
     i++;
   }
 
@@ -138,4 +137,3 @@ int main ()
 
   return 0;
 }
-
