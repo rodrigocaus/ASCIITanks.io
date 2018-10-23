@@ -6,9 +6,7 @@
 #include "../model.hpp"
 #include "../Som.hpp"
 #include "../Teclado.hpp"
-#include "../Fisica.hpp"
 #include "../Tela.hpp"
-#include "../Bot.hpp"
 #include "../Rede.hpp"
 
 //Tamanho da janela de jogo
@@ -80,8 +78,8 @@ int main ()
   	tela->stop();
   	teclado->stop();
   	cliente->stop();
-  	std::cerr << "Matou o programa\n";
+  	std::cerr << "Fim de jogo\n";
 
 	return 0;
-  	
+
 }
