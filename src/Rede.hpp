@@ -6,6 +6,8 @@
 #ifndef REDE_HPP
 #define REDE_HPP
 
+#define MAX_JOGADORES 2
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string>
@@ -20,15 +22,15 @@ namespace Rede {
 class Servidor {
 
     private:
-        int socket_fd, connection_fd;
-        struct sockaddr_in myself, client;
-        socklen_t client_size;
+        int socket_fd, conexoes_fd[MAX_JOGADORES];
+        std::string nome_jogadores[MAX_JOGADORES];
+        struct sockaddr_in myself;
 
     public:
         Servidor();
         ~Servidor();
         void config();
-        void iniciaTransmissao();
+        void conectaCliente(size_t id_cliente , std::string & nome_cliente);
         void stop();
         void transmitirLista(std::string & sEnvio);
         void transmitirTamanho(size_t * tamListas);

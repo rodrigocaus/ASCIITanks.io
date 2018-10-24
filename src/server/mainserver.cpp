@@ -29,15 +29,8 @@ int main ()
   servidor->config();
   servidor->iniciaTransmissao();
 
-  //Inicialização do tanque do jogador e inclusão na lista de tanques
-  Tanque *meuTanque = new Tanque({10.0, 10.0}, 3, 3, 'd');
-  ldt->addTanque(meuTanque);
-
   //Inicialização do modelo físico
   Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
-
-  //Inicialização do gerenciador de bots
-  Bot *bot = new Bot(ldt, meuTanque, MAXX - 2);
 
   uint64_t t0;
   uint64_t t1;
@@ -100,7 +93,6 @@ int main ()
     servidor->receberComando(&c);
 
     //Se houve uma bala gerada, reproduz som de tiro
-    Bala *novaBala = meuTanque->comando(c);
     if(novaBala != NULL){
       ldb->addBala(novaBala);
     }
@@ -114,17 +106,8 @@ int main ()
 
     // Secção de comandos para os tanques
     // Realiza ações com base no número de ciclos passados
-    if (i%25 == 0) {
+    if (i == 50) {
         ldt->incrementaMunicao(); //Recarrega
-    }
-    if (i%50 == 0) {
-        bot->comanda(); //Move
-    }
-    if (i%35 == 0) {
-        bot->atira(ldb); //Atira
-    }
-    if (i == 100) {
-        ldt->addTanque(bot->spawn()); //Novo tanque inimigo criado
         i = 0;
     }
 

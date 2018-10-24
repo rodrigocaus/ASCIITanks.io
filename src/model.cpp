@@ -23,6 +23,19 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
   this->timeInimigo = timeInimigo;
 }
 
+Tanque::Tanque(int maxX , int maxY) {
+  unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+  std::minstd_rand0 geradorAleatorio(seed);
+  this->posicao = {(float) (geradorAleatorio()%maxX), (float) (geradorAleatorio()%maxY)};
+  this->velocidade = {0.0, 0.0};
+  this->vida = 3;
+  this->balaAtual = 3;
+  this->balaMax = 3;
+  this->direcao = 'd';
+  this->velocidadePadrao = 0.025;
+  this->timeInimigo = false;
+}
+
   void Tanque::updatePosicao(Coordenada novaPosicao){
     this->posicao = novaPosicao;
   }

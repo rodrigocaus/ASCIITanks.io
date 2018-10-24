@@ -19,8 +19,6 @@ void Servidor::stop()
 
 void Servidor::config() {
 
-	this->client_size = (socklen_t)sizeof(client);
-
 	//Socket criado com IPv4 e TCP/IP
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -32,21 +30,32 @@ void Servidor::config() {
 	inet_aton("127.0.0.1", &(myself.sin_addr));
 
 	//Tenta ligar a porta desejada ao nosso socket
-	if (bind(socket_fd, (struct sockaddr*)&myself, sizeof(myself)) != 0) {
+	if (bind(this->socket_fd, (struct sockaddr*)&myself, sizeof(myself)) != 0) {
 		std::cerr << "Erro ao efetuar o bind\n";
 	}
-}
 
-void Servidor::iniciaTransmissao(){
+	for (size_t i = 0; i < MAX_JOGADORES; i++) {
+		conexao_fd[i] = 0;
+	}
 
 	//Servidor aberto para requisição de comunicação
 	listen(socket_fd, 2);
 	std::cerr << "Ouvindo\n";
 
-	//Travando até receber alguma requisição
-	std::cerr << "Travado ate receber uma conexao\n";
-	this->connection_fd = accept(socket_fd, (struct sockaddr*)&client, &client_size);
-	std::cerr << "Recebi uma conexao\n";
+}
+
+void Servidor::conectaCliente(size_t id_cliente , std::string & nome_cliente){
+
+	char nome[20] = {0};
+	// Recebe uma conexao de cliente
+
+	this->conexoes_fd[id_cliente] = accept(this->socket_fd, NULL, NULL);
+	recv(this->conexoes_fd[id_cliente], nome, 20, 0);
+	std::cerr << "Recebi a conexao de " << nome << std::endl;
+	this->nome_jogadores[id_cliente] = nome;
+	send(this->conexoes_fd[id_cliente], &id_cliente, sizeof(size_t), 0);
+	nome_cliente = nome;
+
 }
 
 void Servidor::transmitirLista(std::string & sEnvio)
@@ -56,7 +65,7 @@ void Servidor::transmitirLista(std::string & sEnvio)
 	    if (send(connection_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
 	      std::cerr << "Erro ao enviar mensagem das listas\n";
 	    } else {
-	      //std::cerr << "Lista serializada eniada\n";
+	      //std::cerr << "Lista serializada enviada\n";
 	    }
 	}
 }
@@ -102,14 +111,14 @@ void Cliente::config() {
 	inet_aton("127.0.0.1", &(target.sin_addr));
 }
 
-void Cliente::conecta() {
+void Cliente::conecta(const char *nome, size_t *id_cliente) {
 
 	//Estabelece a conexão
-	std::cerr << "tentando conectar\n";
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
     	std::cerr << "Erro em conectar com o servidor\n";
     } else {
-    	std::cerr << "Conectado com sucesso\n";
+    	send(socket_fd, nome, 20, 0);
+		recv(socket_fd, id_cliente, sizeof(size_t), 0);
     }
 }
 

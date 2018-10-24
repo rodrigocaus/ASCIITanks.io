@@ -53,6 +53,7 @@ class Tanque {
 
   public:
   Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao = 0.025, bool timeInimigo = false);
+  Tanque(int maxX, int maxY);
   void updatePosicao(Coordenada novaPosicao);
   void updateVelocidade(Coordenada novaVelocidade);
   void updateDirecao(char novaDirecao);
