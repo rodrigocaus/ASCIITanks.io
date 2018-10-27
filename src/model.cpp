@@ -329,7 +329,7 @@ ListaDeTanques::~ListaDeTanques() {
         if((*this)[i]->getVida() <= 0) {
             alguemMorreu = true;
             delete (*this)[i];
-            (*(this->tanques))[i] = new Tanque(maxX, maxY);
+            /*(*(this->tanques))[i]*/ this->[i] = new Tanque(maxX, maxY);
         }
     }
     return alguemMorreu;
