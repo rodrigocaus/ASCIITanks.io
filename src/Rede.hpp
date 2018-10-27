@@ -27,13 +27,15 @@ class Servidor {
         int socket_fd, conexoes_fd[MAX_JOGADORES];
         std::string nome_jogadores[MAX_JOGADORES];
         struct sockaddr_in myself;
+        int n_clientes;
 
     public:
-        Servidor();
+        Servidor(int n_clientes);
         ~Servidor();
         void config();
         void conectaCliente(size_t id_cliente , std::string & nome_cliente);
-        void stop();
+        void stopTodos();
+        void stopCliente(int id_cliente);
         void transmitirLista(std::string & sEnvio);
         void transmitirTamanho(size_t * tamListas);
         void receberComando(char * c);

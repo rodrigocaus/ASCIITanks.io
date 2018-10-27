@@ -22,78 +22,82 @@ uint64_t get_now_ms() {
 int main ()
 {
 
-    // Cria o objeto responsável por receber o estado de jogo da rede
-  	Rede::Cliente * cliente = new Rede::Cliente();
-  	cliente->config();
+  // Cria o objeto responsável por receber o estado de jogo da rede
+  Rede::Cliente * cliente = new Rede::Cliente();
+  cliente->config();
 
-    // Fazemos o processo de conexão
-    std::string nome;
-    int id;
-    do {
-        std::cout << "Digite um nome com até 20 caracteres: ";
-        std::cin >> nome;
-    } while(nome.length() > 20);
+  // Fazemos o processo de conexão
+  std::string nome;
+  int id;
+  do {
+	  std::cout << "Digite um nome com até 20 caracteres: ";
+	  std::cin >> nome;
+  } while(nome.length() > 20);
 
-  	cliente->conecta(nome, (size_t *) &id);
+  cliente->conecta(nome, (size_t *) &id);
 
-    std::cout << "Conectado com o id " << (int) id << std::endl;
+  std::cout << "Conectado com o id " << (int) id << std::endl;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    return 0;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  
 
-	ListaDeBalas *ldb = new ListaDeBalas();
-	ListaDeTanques *ldt = new ListaDeTanques();
+  ListaDeBalas *ldb = new ListaDeBalas();
+  ListaDeTanques *ldt = new ListaDeTanques();
 
-	//Inicializa a tela
-	Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
-  	tela->init();
+  //Inicializa a tela
+  Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
+  tela->init();
 
-  	//Inicializa o teclado
-  	Teclado *teclado = new Teclado();
-	teclado->init();
+  //Inicializa o teclado
+  Teclado *teclado = new Teclado();
+  teclado->init();
 
-	//Limpa eventuais comandos pre-buffered
-	teclado->getChar();
+  //Limpa eventuais comandos pre-buffered
+  teclado->getChar();
 
-  	//Tamanhos das listas a serem desserializadas
-  	size_t ldbTam , ldtTam;
+  //Tamanhos das listas a serem desserializadas
+  size_t ldbTam , ldtTam;
 
-  	//Strings das listas serializadas
-  	std::string ldbSerial , ldtSerial;
+  //Strings das listas serializadas
+  std::string ldbSerial , ldtSerial;
 
-  	while(1){
+  while(1){
 
-	  	//Recebe os tamanhos das listas
-	  	cliente->receberTamanho(&ldbTam , &ldtTam);
-	  	if(ldtTam < 1) break; //Encerra o programa se não houver mais tanques (jogador morreu)
+	//Recebe os tamanhos das listas
+	cliente->receberTamanho(&ldbTam , &ldtTam);
 
-	  	//Zera as srings de serial e as listas de tanques e balas, para receber as novas
-	  	ldb->limpaLista();
-	  	ldt->limpaLista();
-	  	ldbSerial.clear();
-	  	ldtSerial.clear();
+	//Zera as strings de serial e as listas de tanques e balas, para receber as novas
+	ldb->limpaLista();
+	ldt->limpaLista();
+	ldbSerial.clear();
+	ldtSerial.clear();
 
-	  	//Recebe as novas listas de balas e tanques de forma serial
-	  	cliente->receberLista(ldbSerial , ldbTam);
-	  	cliente->receberLista(ldtSerial , ldtTam);
+	//Recebe as novas listas de balas e tanques de forma serial
+	cliente->receberLista(ldbSerial , ldbTam);
+	cliente->receberLista(ldtSerial , ldtTam);
 
-	  	// Lê o teclado e envia o comando ao servidor
-		char c = teclado->getChar();
-		cliente->enviarComando(c);
+	//Deserializa as listas para criar os novos objetos de lista
+	ldb->deserializaLista(ldbSerial);
+	ldt->deserializaLista(ldtSerial);
 
-	  	//Deserializa as listas para criar os novos objetos de lista
-	  	ldb->deserializaLista(ldbSerial);
-	  	ldt->deserializaLista(ldtSerial);
+	// Atualiza tela
+	tela->update();
 
-	  	// Atualiza tela
-	    tela->update();
-  	}
+	// Lê o teclado e envia o comando ao servidor
+	char c = teclado->getChar();
+	cliente->enviarComando(c);
+	if(c == 'q'){
+		std::this_thread::sleep_for(std::chrono::milliseconds(400));
+		break;
+	}
 
-  	tela->stop();
-  	teclado->stop();
-  	cliente->stop();
-  	std::cerr << "Fim de jogo\n";
+}
 
-	return 0;
+tela->stop();
+teclado->stop();
+cliente->stop();
+std::cerr << "Fim de jogo\n";
+
+return 0;
 
 }

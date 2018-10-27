@@ -106,7 +106,7 @@ class ListaDeTanques {
 	Tanque *removeTanque(int index);
 	void limpaLista();
     std::vector<Tanque *> *getTanques();
-	bool verificaTanquesMortos();
+	bool verificaTanquesMortos(int maxX , int maxY);
 	void incrementaMunicao();
 
 	void serializaLista(std::string &buffer_saida);

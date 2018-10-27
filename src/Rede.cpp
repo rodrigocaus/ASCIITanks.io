@@ -7,17 +7,25 @@
 
 using namespace Rede;
 
-Servidor::Servidor() {}
+Servidor::Servidor(int n_clientes) { this->n_clientes = n_clientes;}
 
 Servidor::~Servidor() { this->stop();}
 
-void Servidor::stop()
+void Servidor::stopTodos()
 {
-	for (size_t i = 0; i < MAX_JOGADORES; i++) {
+	for (size_t i = 0; i < n_clientes; i++) {
 		if(nome_jogadores[i].length() > 0)
 			close(conexoes_fd[i]);
 	}
 	close(socket_fd);
+}
+
+void Servidor::stopCliente(int id_cliente)
+{
+
+	close(conexoes_fd[id_cliente]);
+	(nome_jogadores[id_cliente]).clear();
+
 }
 
 void Servidor::config() {
@@ -64,7 +72,7 @@ void Servidor::conectaCliente(size_t id_cliente , std::string & nome_cliente){
 void Servidor::transmitirLista(std::string & sEnvio)
 {
 	if(sEnvio.length() > 0){
-		for (size_t i = 0; i < MAX_JOGADORES; i++) {
+		for (size_t i = 0; i < n_clientes; i++) {
 			//Enviando estado de jogo serializado
 		    if (nome_jogadores[i].length() > 0 && send(conexoes_fd[i], (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
 		      std::cerr << "Erro ao enviar mensagem das listas\n";
@@ -78,7 +86,7 @@ void Servidor::transmitirLista(std::string & sEnvio)
 void Servidor::transmitirTamanho(size_t * tamListas)
 {
 	//Enviando o tamanho das listas
-	for (size_t i = 0; i < MAX_JOGADORES; i++) {
+	for (size_t i = 0; i < n_clientes; i++) {
 		if (nome_jogadores[i].length() > 0 && send(conexoes_fd[i], (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
 	      std::cerr << "Erro ao enviar mensagem de tamanhos\n";
 	    } else {
@@ -89,13 +97,14 @@ void Servidor::transmitirTamanho(size_t * tamListas)
 
 void Servidor::receberComando(char * c)
 {
-	char comando = 0;
-	/*
-	if((recv(conexoes_fd, &comando , 1, 0))<=0){
-		std::cerr << "Erro ao receber comando do cliente\n";
+	//Recebendo comandos dos jogadores
+	for (size_t i = 0; i < n_clientes; i++) {
+		if (nome_jogadores[i].length() > 0 && recv(conexoes_fd[i], c[i] , MAX_JOGADORES , 0) <= 0) {
+	      std::cerr << "Erro ao receber comandos dos jogadores\n";
+	    } else {
+	      //std::cerr << "Comandos recebidos\n";
+	    }
 	}
-	*/
-	*c = comando;
 }
 
 Cliente::Cliente() {}

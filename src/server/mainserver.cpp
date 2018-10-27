@@ -27,10 +27,6 @@ int main ()
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
 
-  //Inicialização do socket e aguarda contato do cliente
-  Rede::Servidor * servidor = new Rede::Servidor();
-  servidor->config();
-
   // Implementação do sistema de matchmaking
   int n_clientes;
   std::string nome_jogador;
@@ -40,13 +36,17 @@ int main ()
       std::cout << "Digite um valor positivo e menor ou igual a " << MAX_JOGADORES << std::endl;
       std::cin >> n_clientes;
   }
+
+  //Inicialização do socket e aguarda contato do cliente
+  Rede::Servidor * servidor = new Rede::Servidor(n_clientes);
+  servidor->config();
+
+  
   for (size_t i = 0; i < n_clientes; i++) {
       servidor->conectaCliente(i, nome_jogador);
       std::cout << nome_jogador << " se conectou\n";
       std::cout << "aguardando " << (n_clientes - i - 1) << " jogadores\n";
   }
-
-  return 0;
 
   //Inicialização do modelo físico
   Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
@@ -54,11 +54,8 @@ int main ()
   uint64_t t0;
   uint64_t t1;
   uint64_t deltaT;
-  bool alguemMorreu = false;
   int i = 0;
-  int minhaVidaAntes = 0;
-  int minhaVidaAgora = 0;
-  char c;
+  char comandos_clientes[MAX_JOGADORES];
 
   //String que receberá a serialização das listas de balas e tanques
   std::string ldbSerial;
@@ -75,10 +72,8 @@ int main ()
     // Atualiza modelo
     f->update(deltaT);
 
-    // TODO: verificar tanques mortos para desconexão
-
-    //Verifica se levou dano
-    ldt->verificaTanquesMortos();
+    //Verifica os tanques que morreram e da renasce eles
+    ldt->verificaTanquesMortos(MAXX , MAXY);
 
     //Secção de serialização das listas e envio para a rede
     ldb->serializaLista(ldbSerial);
@@ -87,7 +82,7 @@ int main ()
     //Tamanho das listas geradas
     size_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
 
-    //Envia os tamanhos das listas para o cliente saber o quanto deve receber
+    //Envia os tamanhos das listas para os clientes saberem o quanto deve receber
     servidor->transmitirTamanho(tamListas);
 
     //Envia a lista de balas
@@ -96,25 +91,18 @@ int main ()
     //Envia a lista de tanques
     servidor->transmitirLista(ldtSerial);
 
-    //Recebe comando do cliente
-    servidor->receberComando(&c);
+    //Recebe comandos dos clientes
+    servidor->receberComando(comandos_clientes);
 
-    //Se houve uma bala gerada, reproduz som de tiro
-    /*
-    if(novaBala != NULL){
-      ldb->addBala(novaBala);
+    //Verifica os jogadores que sairam
+    for(size_t id_cliente = 0; id_cliente < n_clientes; id_cliente++){
+      if(comandos_clientes[id_cliente] == 'q'){
+        servidor->stopCliente(id_cliente);
+        ldt->removeTanque(id_cliente);
+      }
     }
-    */
-    if (c == 'q') {
-      //Sair do jogo
-
-      size_t tamListas[2] = {0,0};
-      servidor->transmitirTamanho(tamListas);
-      break;
-    }
-
-    // Secção de comandos para os tanques
-    // Realiza ações com base no número de ciclos passados
+  
+    // Recarrega os tanques periodicamente
     if (i == 50) {
         ldt->incrementaMunicao(); //Recarrega
         i = 0;
@@ -125,7 +113,7 @@ int main ()
   }
 
   //Encerra o programa
-  servidor->stop();
+  servidor->stopTodos();
 
   return 0;
 }

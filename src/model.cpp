@@ -317,14 +317,14 @@ ListaDeTanques::~ListaDeTanques() {
 	  	this->removeTanque(i - 1);
 	  }
   }
-  //Verifica tanques que morreram com base na vida. Se 0 ou negativa, morreu, e deleta o tanque.
-  bool ListaDeTanques::verificaTanquesMortos() {
+  //Verifica tanques que morreram com base na vida. Se 0 ou negativa, morreu, e deleta o tanque. Faz respawn.
+  bool ListaDeTanques::verificaTanquesMortos(int maxX , int maxY) {
     bool alguemMorreu = false;
     for (int i = 0; i < this->tanques->size(); i++) {
         if((*(this->tanques))[i]->getVida() <= 0) {
-            this->removeTanque(i);
-            i--;
             alguemMorreu = true;
+            delete tanques[i];
+            tanques[i] = new Tanque(maxX, maxY);
         }
     }
     return alguemMorreu;
