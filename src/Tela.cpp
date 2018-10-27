@@ -5,6 +5,7 @@
 
 #include "model.hpp"
 #include "Tela.hpp"
+#include "Cor.hpp"
 
 using namespace std::chrono;
 
