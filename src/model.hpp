@@ -80,7 +80,7 @@ class ListaDeBalas {
  private:
     std::vector<Bala *> *balas;
 
-  public:
+ public:
     ListaDeBalas();
 	~ListaDeBalas();
     void hardCopy(ListaDeBalas *ldb);
@@ -91,7 +91,8 @@ class ListaDeBalas {
 
 	void serializaLista(std::string &buffer_saida);
 	void deserializaLista(std::string buffer_entrada);
-	Bala& operator[](size_t n);
+	Bala *operator[](size_t n);
+	void operator=(const std::string& ldb_serial);
 };
 
 class ListaDeTanques {
@@ -111,7 +112,8 @@ class ListaDeTanques {
 
 	void serializaLista(std::string &buffer_saida);
 	void deserializaLista(std::string buffer_entrada);
-	Tanque& operator[](size_t n);
+	Tanque *operator[](size_t n);
+	void operator=(const std::string& ldt_serial);
 };
 
 #endif

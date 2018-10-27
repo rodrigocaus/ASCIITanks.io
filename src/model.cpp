@@ -255,7 +255,7 @@ ListaDeBalas::~ListaDeBalas() {
 	  std::string s = "";
 
 	  for (int i = 0; i < (this->balas)->size(); i++) {
-	  	s += ((*this)[i]).toString();
+	  	s += ((*this)[i])->toString();
 	  }
 	  buffer_saida = s;
   }
@@ -277,8 +277,13 @@ ListaDeBalas::~ListaDeBalas() {
 	  }
   }
 
-  Bala& ListaDeBalas::operator[](size_t n) {
-	  return (*((*(this->balas))[n]));
+  Bala *ListaDeBalas::operator[](size_t n) {
+	  return (*(this->balas))[n];
+  }
+
+  void ListaDeBalas::operator=(const std::string& ldb_serial) {
+	  this->limpaLista();
+	  this->deserializaLista(ldb_serial);
   }
 
 
@@ -321,10 +326,10 @@ ListaDeTanques::~ListaDeTanques() {
   bool ListaDeTanques::verificaTanquesMortos(int maxX , int maxY) {
     bool alguemMorreu = false;
     for (int i = 0; i < this->tanques->size(); i++) {
-        if((*(this->tanques))[i]->getVida() <= 0) {
+        if((*this)[i]->getVida() <= 0) {
             alguemMorreu = true;
-            delete tanques[i];
-            tanques[i] = new Tanque(maxX, maxY);
+            delete (*this)[i];
+            (*(this->tanques))[i] = new Tanque(maxX, maxY);
         }
     }
     return alguemMorreu;
@@ -343,7 +348,7 @@ ListaDeTanques::~ListaDeTanques() {
 	  std::string s = "";
 
 	  for (int i = 0; i < (this->tanques)->size(); i++) {
-	  	s += ((*this)[i]).toString();
+	  	s += ((*this)[i])->toString();
 	  }
 	  buffer_saida = s;
   }
@@ -380,6 +385,11 @@ ListaDeTanques::~ListaDeTanques() {
 	 }
   }
 
-  Tanque& ListaDeTanques::operator[](size_t n) {
-	  return (*((*(this->tanques))[n]));
+  Tanque *ListaDeTanques::operator[](size_t n) {
+	  return (*(this->tanques))[n];
+  }
+
+  void ListaDeTanques::operator=(const std::string& ldt_serial) {
+	  this->limpaLista();
+	  this->deserializaLista(ldt_serial);
   }
