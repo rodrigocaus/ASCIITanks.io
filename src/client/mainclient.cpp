@@ -22,6 +22,25 @@ uint64_t get_now_ms() {
 int main ()
 {
 
+    // Cria o objeto responsável por receber o estado de jogo da rede
+  	Rede::Cliente * cliente = new Rede::Cliente();
+  	cliente->config();
+
+    // Fazemos o processo de conexão
+    std::string nome;
+    int id;
+    do {
+        std::cout << "Digite um nome com até 20 caracteres: ";
+        std::cin >> nome;
+    } while(nome.length() > 20);
+
+  	cliente->conecta(nome, (size_t *) &id);
+
+    std::cout << "Conectado com o id " << (int) id << std::endl;
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    return 0;
+
 	ListaDeBalas *ldb = new ListaDeBalas();
 	ListaDeTanques *ldt = new ListaDeTanques();
 
@@ -35,11 +54,6 @@ int main ()
 
 	//Limpa eventuais comandos pre-buffered
 	teclado->getChar();
-
-  	//Cria o objeto responsável por receber o estado de jogo da rede
-  	Rede::Cliente * cliente = new Rede::Cliente();
-  	cliente->config();
-  	cliente->conecta();
 
   	//Tamanhos das listas a serem desserializadas
   	size_t ldbTam , ldtTam;

@@ -13,7 +13,10 @@ Servidor::~Servidor() { this->stop();}
 
 void Servidor::stop()
 {
-	close(connection_fd);
+	for (size_t i = 0; i < MAX_JOGADORES; i++) {
+		if(nome_jogadores[i].length() > 0)
+			close(conexoes_fd[i]);
+	}
 	close(socket_fd);
 }
 
@@ -35,7 +38,7 @@ void Servidor::config() {
 	}
 
 	for (size_t i = 0; i < MAX_JOGADORES; i++) {
-		conexao_fd[i] = 0;
+		conexoes_fd[i] = 0;
 	}
 
 	//Servidor aberto para requisição de comunicação
@@ -46,7 +49,7 @@ void Servidor::config() {
 
 void Servidor::conectaCliente(size_t id_cliente , std::string & nome_cliente){
 
-	char nome[20] = {0};
+	char nome[21] = {0};
 	// Recebe uma conexao de cliente
 
 	this->conexoes_fd[id_cliente] = accept(this->socket_fd, NULL, NULL);
@@ -61,31 +64,37 @@ void Servidor::conectaCliente(size_t id_cliente , std::string & nome_cliente){
 void Servidor::transmitirLista(std::string & sEnvio)
 {
 	if(sEnvio.length() > 0){
-		//Enviando estado de jogo serializado
-	    if (send(connection_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
-	      std::cerr << "Erro ao enviar mensagem das listas\n";
-	    } else {
-	      //std::cerr << "Lista serializada enviada\n";
-	    }
+		for (size_t i = 0; i < MAX_JOGADORES; i++) {
+			//Enviando estado de jogo serializado
+		    if (nome_jogadores[i].length() > 0 && send(conexoes_fd[i], (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
+		      std::cerr << "Erro ao enviar mensagem das listas\n";
+		    } else {
+		      //std::cerr << "Lista serializada enviada\n";
+		    }
+		}
 	}
 }
 
 void Servidor::transmitirTamanho(size_t * tamListas)
 {
 	//Enviando o tamanho das listas
-    if (send(connection_fd, (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
-      std::cerr << "Erro ao enviar mensagem de tamanhos\n";
-    } else {
-      //std::cerr << "Tamanho enviado\n";
-    }
+	for (size_t i = 0; i < MAX_JOGADORES; i++) {
+		if (nome_jogadores[i].length() > 0 && send(conexoes_fd[i], (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
+	      std::cerr << "Erro ao enviar mensagem de tamanhos\n";
+	    } else {
+	      //std::cerr << "Tamanho enviado\n";
+	    }
+	}
 }
 
 void Servidor::receberComando(char * c)
 {
-	char comando;
-	if((recv(connection_fd, &comando , 1, 0))<=0){
+	char comando = 0;
+	/*
+	if((recv(conexoes_fd, &comando , 1, 0))<=0){
 		std::cerr << "Erro ao receber comando do cliente\n";
 	}
+	*/
 	*c = comando;
 }
 
@@ -111,14 +120,17 @@ void Cliente::config() {
 	inet_aton("127.0.0.1", &(target.sin_addr));
 }
 
-void Cliente::conecta(const char *nome, size_t *id_cliente) {
+void Cliente::conecta(std::string &nome_cliente, size_t *id_cliente) {
 
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
     	std::cerr << "Erro em conectar com o servidor\n";
     } else {
+		char nome[21] = {0};
+		strncpy(nome, nome_cliente.c_str(), nome_cliente.length());
     	send(socket_fd, nome, 20, 0);
 		recv(socket_fd, id_cliente, sizeof(size_t), 0);
+		std::cout << "Conectado ao servidor\n";
     }
 }
 

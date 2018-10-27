@@ -6,16 +6,18 @@
 #ifndef REDE_HPP
 #define REDE_HPP
 
-#define MAX_JOGADORES 2
-
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+
+#define MAX_JOGADORES 2
 
 namespace Rede {
 
@@ -48,7 +50,7 @@ class Cliente {
         Cliente();
         ~Cliente();
         void config();
-        void conecta();
+        void conecta(std::string &nome_cliente, size_t *id_cliente);
         void stop();
         void receberLista(std::string & buf, size_t tamanho);
         void receberTamanho(size_t * ldbTam , size_t * ldtTam);

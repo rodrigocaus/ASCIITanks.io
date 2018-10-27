@@ -7,10 +7,13 @@
 #include "../Fisica.hpp"
 #include "../Bot.hpp"
 #include "../Rede.hpp"
+#include "../Cor.hpp"
 
 //Tamanho da janela de jogo
 #define MAXX 30
 #define MAXY 60
+
+#define MAX_JOGADORES 2
 
 //Pega o tempo em milisegundos
 using namespace std::chrono;
@@ -27,7 +30,23 @@ int main ()
   //Inicialização do socket e aguarda contato do cliente
   Rede::Servidor * servidor = new Rede::Servidor();
   servidor->config();
-  servidor->iniciaTransmissao();
+
+  // Implementação do sistema de matchmaking
+  int n_clientes;
+  std::string nome_jogador;
+  std::cout << "Digite o numero de jogadores: ";
+  std::cin >> n_clientes;
+  while(n_clientes <= 0 || n_clientes > MAX_JOGADORES) {
+      std::cout << "Digite um valor positivo e menor ou igual a " << MAX_JOGADORES << std::endl;
+      std::cin >> n_clientes;
+  }
+  for (size_t i = 0; i < n_clientes; i++) {
+      servidor->conectaCliente(i, nome_jogador);
+      std::cout << nome_jogador << " se conectou\n";
+      std::cout << "aguardando " << (n_clientes - i - 1) << " jogadores\n";
+  }
+
+  return 0;
 
   //Inicialização do modelo físico
   Fisica *f = new Fisica(ldt, ldb, (float) MAXX, (float) MAXY);
@@ -53,23 +72,11 @@ int main ()
     t1 = get_now_ms();
     deltaT = t1-t0;
 
-    //Vida antes da atualização do modelo
-    minhaVidaAntes = meuTanque->getVida();
     // Atualiza modelo
     f->update(deltaT);
-    //Vida após a atualização do modelo
-    minhaVidaAgora = meuTanque->getVida();
 
-    //Verifica se o tanque morreu
-    if(minhaVidaAgora <= 0) {
-        //Game Over
+    // TODO: verificar tanques mortos para desconexão
 
-        //Envia tam da lista de tanques como zero, indincando que o jogo acabou
-        size_t tamListas[2] = {0,0};
-        servidor->transmitirTamanho(tamListas);
-
-        break;
-    }
     //Verifica se levou dano
     ldt->verificaTanquesMortos();
 
@@ -93,9 +100,11 @@ int main ()
     servidor->receberComando(&c);
 
     //Se houve uma bala gerada, reproduz som de tiro
+    /*
     if(novaBala != NULL){
       ldb->addBala(novaBala);
     }
+    */
     if (c == 'q') {
       //Sair do jogo
 
