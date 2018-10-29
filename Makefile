@@ -1,7 +1,7 @@
 DIR = src/
-SERVER_HPP = $(DIR)model.hpp $(DIR)Fisica.hpp $(DIR)Bot.hpp $(DIR)Rede.hpp
+SERVER_HPP = $(DIR)model.hpp $(DIR)Fisica.hpp $(DIR)Rede.hpp
 CLIENT_HPP = $(DIR)model.hpp $(DIR)Rede.hpp $(DIR)Teclado.hpp $(DIR)Tela.hpp $(DIR)Som.hpp
-SERVER_SRC = $(DIR)model.cpp $(DIR)Fisica.cpp $(DIR)Bot.cpp $(DIR)Rede.cpp
+SERVER_SRC = $(DIR)model.cpp $(DIR)Fisica.cpp $(DIR)Rede.cpp
 CLIENT_SRC = $(DIR)model.cpp $(DIR)Rede.cpp $(DIR)Teclado.cpp $(DIR)Tela.cpp $(DIR)Som.cpp
 SERVER_MAIN := $(wildcard $(DIR)server/*.cpp)
 CLIENT_MAIN := $(wildcard $(DIR)client/*.cpp)

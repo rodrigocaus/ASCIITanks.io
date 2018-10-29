@@ -12,7 +12,7 @@ float distancia(Coordenada p, Coordenada q) {
 	return (float) sqrt((p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
 }
 
-Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao, bool timeInimigo) {
+Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao, int id) {
   this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
   this->vida = vida;
@@ -20,10 +20,10 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
   this->balaMax = balaMax;
   this->direcao = direcao;
   this->velocidadePadrao = velocidadePadrao;
-  this->timeInimigo = timeInimigo;
+  this->id = id;
 }
 
-Tanque::Tanque(int maxX , int maxY) {
+Tanque::Tanque(int maxX , int maxY,  int id) {
   unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::minstd_rand0 geradorAleatorio(seed);
   this->posicao = {(float) (geradorAleatorio()%maxX), (float) (geradorAleatorio()%maxY)};
@@ -33,7 +33,7 @@ Tanque::Tanque(int maxX , int maxY) {
   this->balaMax = 3;
   this->direcao = 'd';
   this->velocidadePadrao = 0.025;
-  this->timeInimigo = false;
+  this->id = id;
 }
 
   void Tanque::updatePosicao(Coordenada novaPosicao){
@@ -66,6 +66,10 @@ Tanque::Tanque(int maxX , int maxY) {
     return velocidade;
   }
 
+  float Tanque::getVelocidadePadrao(){
+    return velocidadePadrao;
+  }
+
   Coordenada Tanque::getPosicao(){
     return posicao;
   }
@@ -86,8 +90,8 @@ Tanque::Tanque(int maxX , int maxY) {
     return direcao;
   }
 
-  bool Tanque::getTime() {
-	return timeInimigo;
+  int Tanque::getId() {
+	return id;
   }
 
   //Realiza movimentos e ações do tanque
@@ -153,7 +157,7 @@ Tanque::Tanque(int maxX , int maxY) {
 	  s += std::to_string((this->posicao).x) + "," + std::to_string((this->posicao).y) + ",";
 	  s += std::to_string(this->vida) + "," + std::to_string(this->direcao) + ",";
 	  s += std::to_string(this->balaAtual) + "," + std::to_string(this->balaMax) + ",";
-	  s += std::to_string(this->velocidadePadrao) + "," + std::to_string((int)this->timeInimigo) + "\n";
+	  s += std::to_string(this->velocidadePadrao) + "," + std::to_string(this->id) + "\n";
 
 	  return s;
   }
@@ -299,7 +303,8 @@ ListaDeTanques::~ListaDeTanques() {
     std::vector<Tanque *> *tanques = ldt->getTanques();
 
     for (int k=0; k<tanques->size(); k++) {
-      Tanque *t = new Tanque((*tanques)[k]->getPosicao(), (*tanques)[k]->getVida(),(*tanques)[k]->getBalaMax(), (*tanques)[k]->getDirecao());
+      Tanque *t = new Tanque((*tanques)[k]->getPosicao(), (*tanques)[k]->getVida(),(*tanques)[k]->getBalaMax(),
+                             (*tanques)[k]->getDirecao() , (*tanques)[k]->getVelocidadePadrao(), (*tanques)[k]->getId());
       this->addTanque(t);
     }
   }
@@ -312,24 +317,55 @@ ListaDeTanques::~ListaDeTanques() {
     return (this->tanques);
   }
 
-  Tanque *ListaDeTanques::removeTanque(int index) {
-    Tanque *t = (*(this->tanques))[index];
-    (this->tanques)->erase((this->tanques)->begin() + index);
-    return t;
+  void ListaDeTanques::removeTanque(int id) {
+
+    for(int i = 0 ; i < (this->tanques)->size() ; i++)
+    {
+      if((*(this->tanques))[i]->getId() == id)
+      {
+        delete (*(this->tanques))[i];
+        (this->tanques)->erase((this->tanques)->begin() + id);
+        break;
+      }
+    }
   }
+
+
+  Bala *ListaDeTanques::comandaTanque(int id, char c) {
+  
+    Bala * bala;
+    for(int i = 0 ; i < (this->tanques)->size() ; i++)
+    {
+      if((*(this->tanques))[i]->getId() == id)
+      {
+        bala = (*(this->tanques))[i]->comando(c);
+        break;
+      }
+    }
+    return bala;
+  }
+
   void ListaDeTanques::limpaLista() {
 	  for (int i = (this->tanques)->size(); i > 0; i--) {
 	  	this->removeTanque(i - 1);
 	  }
   }
-  //Verifica tanques que morreram com base na vida. Se 0 ou negativa, morreu, e deleta o tanque. Faz respawn.
+  //Verifica tanques que morreram com base na vida. Se 0 ou negativa, morreu, "renasce" em algum lugar do mapa.
   bool ListaDeTanques::verificaTanquesMortos(int maxX , int maxY) {
     bool alguemMorreu = false;
+
     for (int i = 0; i < this->tanques->size(); i++) {
         if((*this)[i]->getVida() <= 0) {
+
+            unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::minstd_rand0 geradorAleatorio(seed);
+            (*(this->tanques))[i]->updatePosicao({(float) (geradorAleatorio()%maxX), (float) (geradorAleatorio()%maxY)});
+            (*(this->tanques))[i]->updateVelocidade({0.0, 0.0});
+            (*(this->tanques))[i]->updateVida(3);
+            (*(this->tanques))[i]->updateBala(3);
+            (*(this->tanques))[i]->updateDirecao('d');
+
             alguemMorreu = true;
-            delete (*this)[i];
-            (*(this->tanques))[i] = new Tanque(maxX, maxY);
         }
     }
     return alguemMorreu;

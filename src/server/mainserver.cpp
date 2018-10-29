@@ -5,7 +5,6 @@
 
 #include "../model.hpp"
 #include "../Fisica.hpp"
-#include "../Bot.hpp"
 #include "../Rede.hpp"
 #include "../Cor.hpp"
 
@@ -24,6 +23,8 @@ uint64_t get_now_ms() {
 int main ()
 {
 
+  std::vector<jogador> jogadores;
+
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
 
@@ -37,15 +38,18 @@ int main ()
       std::cin >> n_clientes;
   }
 
-  //Inicialização do socket e aguarda contato do cliente
-  Rede::Servidor * servidor = new Rede::Servidor(n_clientes);
+  //Inicialização do socket e aguarda contato do jogador
+  Rede::Servidor * servidor = new Rede::Servidor();
   servidor->config();
 
-  
-  for (size_t i = 0; i < n_clientes; i++) {
-      servidor->conectaCliente(i, nome_jogador);
-      std::cout << nome_jogador << " se conectou\n";
-      std::cout << "aguardando " << (n_clientes - i - 1) << " jogadores\n";
+  //Conecta os clientes, construindo as structs jogadores com informações de nome e id
+  servidor->conectaClientes(n_clientes , jogadores);
+
+  //Cria os tanques do jogadores
+  for(int id = 0; id < n_clientes ; id++){
+    
+    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.025 , id);
+    ldt->addTanque(tanque);
   }
 
   //Inicialização do modelo físico
@@ -54,8 +58,7 @@ int main ()
   uint64_t t0;
   uint64_t t1;
   uint64_t deltaT;
-  int i = 0;
-  char comandos_clientes[MAX_JOGADORES];
+  int periodo = 0;
 
   //String que receberá a serialização das listas de balas e tanques
   std::string ldbSerial;
@@ -83,37 +86,46 @@ int main ()
     size_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
 
     //Envia os tamanhos das listas para os clientes saberem o quanto deve receber
-    servidor->transmitirTamanho(tamListas);
+    servidor->transmitirTamanho(tamListas , jogadores);
 
     //Envia a lista de balas
-    servidor->transmitirLista(ldbSerial);
+    servidor->transmitirLista(ldbSerial , jogadores);
 
     //Envia a lista de tanques
-    servidor->transmitirLista(ldtSerial);
+    servidor->transmitirLista(ldtSerial , jogadores);
 
     //Recebe comandos dos clientes
-    servidor->receberComando(comandos_clientes);
+    servidor->receberComando(jogadores);
 
-    //Verifica os jogadores que sairam
-    for(size_t id_cliente = 0; id_cliente < n_clientes; id_cliente++){
-      if(comandos_clientes[id_cliente] == 'q'){
-        servidor->stopCliente(id_cliente);
-        ldt->removeTanque(id_cliente);
+    //Verifica os comandos dos jogadores
+    for(size_t i = 0; i < jogadores.size(); i++){
+      if(jogadores[i].comando == 'q'){
+        ldt->removeTanque(jogadores[i].id);
+        close(jogadores[i].conexao_fd);
+        jogadores.erase(jogadores.begin() + i);
+        i--;
+      } else {
+        Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
+        if(novaBala != NULL) ldb->addBala(novaBala);
       }
     }
-  
+
+    if(jogadores.size() == 0) break;
+
     // Recarrega os tanques periodicamente
-    if (i == 50) {
+    if (periodo == 50) {
         ldt->incrementaMunicao(); //Recarrega
-        i = 0;
+        periodo = 0;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(30));
-    i++;
+    //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    periodo++;
   }
 
   //Encerra o programa
-  servidor->stopTodos();
+  //servidor->stopTodos(jogadores);
+  delete servidor;
+
 
   return 0;
 }

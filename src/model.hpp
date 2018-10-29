@@ -48,13 +48,14 @@ class Tanque {
   int vida;
   int balaAtual;
   int balaMax;
+  int id;
   char direcao;
   float velocidadePadrao;
-  bool timeInimigo;
+  
 
   public:
-  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao = 0.025, bool timeInimigo = false);
-  Tanque(int maxX, int maxY);
+  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao , int id);
+  Tanque(int maxX, int maxY , int id);
   void updatePosicao(Coordenada novaPosicao);
   void updateVelocidade(Coordenada novaVelocidade);
   void updateDirecao(char novaDirecao);
@@ -66,8 +67,9 @@ class Tanque {
   int getVida();
   int getBalaAtual();
   int getBalaMax();
+  float getVelocidadePadrao();
   char getDirecao();
-  bool getTime();
+  int getId();
 
   Bala *comando(char c);
 
@@ -101,19 +103,19 @@ class ListaDeTanques {
 
   public:
     ListaDeTanques();
-	~ListaDeTanques();
+	  ~ListaDeTanques();
     void hardCopy(ListaDeTanques *ldt);
     void addTanque(Tanque *t);
-	Tanque *removeTanque(int index);
-	void limpaLista();
+	  void removeTanque(int id);
+    Bala * comandaTanque(int id , char c);
+	  void limpaLista();
     std::vector<Tanque *> *getTanques();
-	bool verificaTanquesMortos(int maxX , int maxY);
-	void incrementaMunicao();
-
-	void serializaLista(std::string &buffer_saida);
-	void deserializaLista(std::string buffer_entrada);
-	Tanque *operator[](size_t n);
-	void operator=(const std::string& ldt_serial);
+	  bool verificaTanquesMortos(int maxX , int maxY);
+	  void incrementaMunicao();
+	  void serializaLista(std::string &buffer_saida);
+	  void deserializaLista(std::string buffer_entrada);
+	  Tanque *operator[](size_t n);
+	  void operator=(const std::string& ldt_serial);
 };
 
 #endif

@@ -63,7 +63,7 @@ void Tela::update() {
     wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
 
     //Colore o tanque de vermelho se for inimigo e preto se for a gente
-    if((*tanques)[k]->getTime() == true){
+    if((*tanques)[k]->getId() == 0){
         wattron(this->janelaDeJogo, COLOR_PAIR(2));
     }
 
@@ -87,7 +87,7 @@ void Tela::update() {
             waddch(this->janelaDeJogo, 'e');
             break;
     }
-    if((*tanques)[k]->getTime() == true){
+    if((*tanques)[k]->getId() == 0){
         wattroff(this->janelaDeJogo, COLOR_PAIR(2));
     }
   }

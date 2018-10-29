@@ -9,12 +9,20 @@
 #include <cstdio>
 #include <unistd.h>
 #include <string>
+#include <vector>
 #include <cstring>
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+struct jogador {
+  int id;
+  int conexao_fd;
+  char comando;
+  std::string nome;
+};
 
 
 #define MAX_JOGADORES 2
@@ -24,21 +32,18 @@ namespace Rede {
 class Servidor {
 
     private:
-        int socket_fd, conexoes_fd[MAX_JOGADORES];
-        std::string nome_jogadores[MAX_JOGADORES];
-        struct sockaddr_in myself;
-        int n_clientes;
+        int socket_fd;
+        struct sockaddr_in myself; 
 
     public:
-        Servidor(int n_clientes);
+        Servidor();
         ~Servidor();
         void config();
-        void conectaCliente(size_t id_cliente , std::string & nome_cliente);
-        void stopTodos();
-        void stopCliente(int id_cliente);
-        void transmitirLista(std::string & sEnvio);
-        void transmitirTamanho(size_t * tamListas);
-        void receberComando(char * c);
+        void conectaClientes(int id_cliente , std::vector<jogador> & jogadores);
+        void stopTodos(std::vector<jogador> & jogadores);
+        void transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores);
+        void transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores);
+        void receberComando(std::vector<jogador> & jogadores);
 };
 
 

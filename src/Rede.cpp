@@ -7,25 +7,17 @@
 
 using namespace Rede;
 
-Servidor::Servidor(int n_clientes) { this->n_clientes = n_clientes;}
+Servidor::Servidor() {}
 
-Servidor::~Servidor() { this->stop();}
+Servidor::~Servidor() { close(socket_fd);}
 
-void Servidor::stopTodos()
+void Servidor::stopTodos(std::vector<jogador> & jogadores)
 {
-	for (size_t i = 0; i < n_clientes; i++) {
-		if(nome_jogadores[i].length() > 0)
-			close(conexoes_fd[i]);
+	for (size_t i = 0; i < jogadores.size(); i++) {
+		
+		close(jogadores[i].conexao_fd);
 	}
 	close(socket_fd);
-}
-
-void Servidor::stopCliente(int id_cliente)
-{
-
-	close(conexoes_fd[id_cliente]);
-	(nome_jogadores[id_cliente]).clear();
-
 }
 
 void Servidor::config() {
@@ -45,36 +37,37 @@ void Servidor::config() {
 		std::cerr << "Erro ao efetuar o bind\n";
 	}
 
-	for (size_t i = 0; i < MAX_JOGADORES; i++) {
-		conexoes_fd[i] = 0;
-	}
-
 	//Servidor aberto para requisição de comunicação
 	listen(socket_fd, 2);
 	std::cerr << "Ouvindo\n";
 
 }
 
-void Servidor::conectaCliente(size_t id_cliente , std::string & nome_cliente){
+void Servidor::conectaClientes(int n_clientes , std::vector<jogador> & jogadores){
 
 	char nome[21] = {0};
+
 	// Recebe uma conexao de cliente
 
-	this->conexoes_fd[id_cliente] = accept(this->socket_fd, NULL, NULL);
-	recv(this->conexoes_fd[id_cliente], nome, 20, 0);
-	std::cerr << "Recebi a conexao de " << nome << std::endl;
-	this->nome_jogadores[id_cliente] = nome;
-	send(this->conexoes_fd[id_cliente], &id_cliente, sizeof(size_t), 0);
-	nome_cliente = nome;
-
+	for (int i = 0; i < n_clientes; i++) {
+      jogadores.push_back(jogador());
+      jogadores[i].conexao_fd = accept(this->socket_fd, NULL, NULL);
+      recv(jogadores[i].conexao_fd, nome, 20, 0);
+      jogadores[i].nome = nome;
+      jogadores[i].id = i;
+      send(jogadores[i].conexao_fd, &(jogadores[i].id), sizeof(int), 0);
+      std::cerr << nome << " se conectou\n";
+      std::cerr << "Aguardando " << (n_clientes - i - 1) << " jogadores\n";
+  	}
+  	std::cerr << "Iniciando Partida\n";
 }
 
-void Servidor::transmitirLista(std::string & sEnvio)
+void Servidor::transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores)
 {
 	if(sEnvio.length() > 0){
-		for (size_t i = 0; i < n_clientes; i++) {
+		for (size_t i = 0; i < jogadores.size(); i++) {
 			//Enviando estado de jogo serializado
-		    if (nome_jogadores[i].length() > 0 && send(conexoes_fd[i], (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
+		    if (send(jogadores[i].conexao_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
 		      std::cerr << "Erro ao enviar mensagem das listas\n";
 		    } else {
 		      //std::cerr << "Lista serializada enviada\n";
@@ -83,11 +76,11 @@ void Servidor::transmitirLista(std::string & sEnvio)
 	}
 }
 
-void Servidor::transmitirTamanho(size_t * tamListas)
+void Servidor::transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores)
 {
 	//Enviando o tamanho das listas
-	for (size_t i = 0; i < n_clientes; i++) {
-		if (nome_jogadores[i].length() > 0 && send(conexoes_fd[i], (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
+	for (size_t i = 0; i < jogadores.size(); i++) {
+		if (send(jogadores[i].conexao_fd, (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
 	      std::cerr << "Erro ao enviar mensagem de tamanhos\n";
 	    } else {
 	      //std::cerr << "Tamanho enviado\n";
@@ -95,11 +88,11 @@ void Servidor::transmitirTamanho(size_t * tamListas)
 	}
 }
 
-void Servidor::receberComando(char * c)
+void Servidor::receberComando(std::vector<jogador> & jogadores)
 {
 	//Recebendo comandos dos jogadores
-	for (size_t i = 0; i < n_clientes; i++) {
-		if (nome_jogadores[i].length() > 0 && recv(conexoes_fd[i], c[i] , MAX_JOGADORES , 0) <= 0) {
+	for (size_t i = 0; i < jogadores.size(); i++) {
+		if (recv(jogadores[i].conexao_fd, &(jogadores[i].comando) , 1 , 0) <= 0) {
 	      std::cerr << "Erro ao receber comandos dos jogadores\n";
 	    } else {
 	      //std::cerr << "Comandos recebidos\n";
@@ -134,6 +127,7 @@ void Cliente::conecta(std::string &nome_cliente, size_t *id_cliente) {
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
     	std::cerr << "Erro em conectar com o servidor\n";
+    	exit(0);
     } else {
 		char nome[21] = {0};
 		strncpy(nome, nome_cliente.c_str(), nome_cliente.length());

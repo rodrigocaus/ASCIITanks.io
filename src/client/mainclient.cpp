@@ -61,7 +61,7 @@ int main ()
   //Strings das listas serializadas
   std::string ldbSerial , ldtSerial;
 
-  while(1){
+ while(1){
 
 	//Recebe os tamanhos das listas
 	cliente->receberTamanho(&ldbTam , &ldtTam);
@@ -87,7 +87,6 @@ int main ()
 	char c = teclado->getChar();
 	cliente->enviarComando(c);
 	if(c == 'q'){
-		std::this_thread::sleep_for(std::chrono::milliseconds(400));
 		break;
 	}
 
