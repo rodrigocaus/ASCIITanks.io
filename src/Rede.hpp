@@ -61,7 +61,7 @@ class Cliente {
         void stop();
         void receberLista(std::string & buf, size_t tamanho);
         void receberTamanho(size_t * ldbTam , size_t * ldtTam);
-        void enviarComando(char c);
+        int enviarComando(char c);
 };
 
 }

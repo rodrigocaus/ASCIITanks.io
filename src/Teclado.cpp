@@ -3,18 +3,23 @@
  *  Victor Ferrão Santolim - 187888
  */
 
-#include "model.hpp"
 #include "Teclado.hpp"
 
 //Função que roda em thread verificando input de teclado e salvando a ultima tecla registrada
-void threadFunction(char *keybuffer, int *control)
+void threadFunction(Rede::Cliente *cliente, char *keybuffer, int *control)
 {
   char c;
   while ((*control) == 1) {
     c = getch();
-    if (c!=ERR) (*keybuffer) = c;
+    if (c!=ERR)
+    {
+      (*keybuffer) = c;
+      if ((cliente->enviarComando(c)) <= 0) {
+        std::cerr << "Erro ao enviar comando ao servidor\n";
+      }
+    } 
     else (*keybuffer) = 0;
-    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    std::this_thread::sleep_for (std::chrono::milliseconds(20));
   }
   return;
 }
@@ -25,7 +30,7 @@ Teclado::Teclado() {
 Teclado::~Teclado() {
 }
 
-void Teclado::init() {
+void Teclado::init(Rede::Cliente *cliente) {
   // Inicializa ncurses
   raw();				         /* Line buffering disabled	*/
   keypad(stdscr, TRUE);	 /* We get F1, F2 etc..		*/
@@ -33,7 +38,7 @@ void Teclado::init() {
   curs_set(0);           /* Do not display cursor */
 
   this->rodando = 1;
-  (this->kbThread) = std::thread(threadFunction, &(this->ultimaCaptura), &(this->rodando));
+  (this->kbThread) = std::thread(threadFunction, cliente , &(this->ultimaCaptura), &(this->rodando));
 }
 
 void Teclado::stop() {

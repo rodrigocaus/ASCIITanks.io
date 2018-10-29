@@ -5,9 +5,10 @@
 
 #include "../model.hpp"
 #include "../Som.hpp"
+#include "../Rede.hpp"
 #include "../Teclado.hpp"
 #include "../Tela.hpp"
-#include "../Rede.hpp"
+
 
 //Tamanho da janela de jogo
 #define MAXX 30
@@ -50,7 +51,7 @@ int main ()
 
   //Inicializa o teclado
   Teclado *teclado = new Teclado();
-  teclado->init();
+  teclado->init(cliente);
 
   //Limpa eventuais comandos pre-buffered
   teclado->getChar();
@@ -63,14 +64,14 @@ int main ()
 
  while(1){
 
-	//Recebe os tamanhos das listas
-	cliente->receberTamanho(&ldbTam , &ldtTam);
-
 	//Zera as strings de serial e as listas de tanques e balas, para receber as novas
 	ldb->limpaLista();
 	ldt->limpaLista();
 	ldbSerial.clear();
 	ldtSerial.clear();
+
+	//Recebe os tamanhos das listas
+	cliente->receberTamanho(&ldbTam , &ldtTam);
 
 	//Recebe as novas listas de balas e tanques de forma serial
 	cliente->receberLista(ldbSerial , ldbTam);
@@ -83,9 +84,8 @@ int main ()
 	// Atualiza tela
 	tela->update();
 
-	// Lê o teclado e envia o comando ao servidor
+	// Lê o teclado e envia o comando ao servidor (via thread agora)
 	char c = teclado->getChar();
-	cliente->enviarComando(c);
 	if(c == 'q'){
 		break;
 	}

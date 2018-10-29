@@ -168,9 +168,7 @@ void Cliente::receberTamanho(size_t * ldbTam , size_t * ldtTam)
 	*ldtTam = tamListas[1];
 }
 
-void Cliente::enviarComando(char c)
+int Cliente::enviarComando(char c)
 {
-	if (send(socket_fd, &c , sizeof(char) , 0) < 0) {
-      std::cerr << "Erro ao enviar comando ao servidor\n";
-    }
+	return send(socket_fd, &c , sizeof(char) , 0);
 }

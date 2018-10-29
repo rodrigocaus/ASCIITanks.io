@@ -12,7 +12,7 @@
 #define MAXX 30
 #define MAXY 60
 
-#define MAX_JOGADORES 2
+#define MAX_JOGADORES 3
 
 //Pega o tempo em milisegundos
 using namespace std::chrono;
@@ -57,7 +57,10 @@ int main ()
 
   uint64_t t0;
   uint64_t t1;
+  uint64_t t3;
+  uint64_t t4;
   uint64_t deltaT;
+  uint64_t deltaT2;
   int periodo = 0;
 
   //String que receberá a serialização das listas de balas e tanques
@@ -94,9 +97,11 @@ int main ()
     //Envia a lista de tanques
     servidor->transmitirLista(ldtSerial , jogadores);
 
+    t3 = get_now_ms();
     //Recebe comandos dos clientes
     servidor->receberComando(jogadores);
 
+    
     //Verifica os comandos dos jogadores
     for(size_t i = 0; i < jogadores.size(); i++){
       if(jogadores[i].comando == 'q'){
@@ -110,6 +115,11 @@ int main ()
       }
     }
 
+    t4 = get_now_ms();
+    deltaT2 = t4-t3;
+
+    std::cout << "Tempo: " << deltaT2 << std::endl;
+    
     if(jogadores.size() == 0) break;
 
     // Recarrega os tanques periodicamente
