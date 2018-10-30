@@ -117,6 +117,9 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
           this->updateDirecao('d');
           this->updateVelocidade({0.0, (this->velocidadePadrao)});
           break;
+        case '0':
+          this->updateVelocidade({0.0, 0.0});
+          break;
         case ' ':
           //Atira bala
           if(this->balaAtual > 0) {
@@ -139,7 +142,6 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
                     break;
               }
               b = new Bala(this->direcao , posBala);
-
           }
           break;
         default:

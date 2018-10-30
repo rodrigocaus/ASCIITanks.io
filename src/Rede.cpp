@@ -5,18 +5,29 @@
 
 #include "Rede.hpp"
 
+//Função que roda em thread e fica verificando comandos de um jogador e atualizando
+void recebeComandos(int *conexao_fd , char *comando)
+{
+  char c;
+  while (1) {
+    if (recv((*conexao_fd), &c , 1 , 0) <= 0) {
+	      std::cerr << "Erro ao receber comandos dos jogadores\n";
+	}
+	std::cerr << "Recebi comando = '" << c << "'\n";
+	*comando = c;
+	if(c == 'q') break; 
+  }
+  return;
+}
+
 using namespace Rede;
 
 Servidor::Servidor() {}
 
 Servidor::~Servidor() { close(socket_fd);}
 
-void Servidor::stopTodos(std::vector<jogador> & jogadores)
+void Servidor::stop()
 {
-	for (size_t i = 0; i < jogadores.size(); i++) {
-		
-		close(jogadores[i].conexao_fd);
-	}
 	close(socket_fd);
 }
 
@@ -88,15 +99,11 @@ void Servidor::transmitirTamanho(size_t * tamListas , std::vector<jogador> & jog
 	}
 }
 
-void Servidor::receberComando(std::vector<jogador> & jogadores)
+void Servidor::initReceberComando(std::vector<jogador> & jogadores)
 {
 	//Recebendo comandos dos jogadores
 	for (size_t i = 0; i < jogadores.size(); i++) {
-		if (recv(jogadores[i].conexao_fd, &(jogadores[i].comando) , 1 , 0) <= 0) {
-	      std::cerr << "Erro ao receber comandos dos jogadores\n";
-	    } else {
-	      //std::cerr << "Comandos recebidos\n";
-	    }
+		jogadores[i].threadJogador  = std::thread(recebeComandos, &(jogadores[i].conexao_fd) , &(jogadores[i].comando));
 	}
 }
 

@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <thread>
 #include <cstring>
 #include <iostream>
 #include <sys/types.h>
@@ -22,10 +23,10 @@ struct jogador {
   int conexao_fd;
   char comando;
   std::string nome;
+  std::thread threadJogador;
 };
 
-
-#define MAX_JOGADORES 2
+void recebeComandos(int *conexao_fd , char *comando);
 
 namespace Rede {
 
@@ -40,10 +41,10 @@ class Servidor {
         ~Servidor();
         void config();
         void conectaClientes(int id_cliente , std::vector<jogador> & jogadores);
-        void stopTodos(std::vector<jogador> & jogadores);
+        void stop();
         void transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores);
         void transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores);
-        void receberComando(std::vector<jogador> & jogadores);
+        void initReceberComando(std::vector<jogador> & jogadores);
 };
 
 

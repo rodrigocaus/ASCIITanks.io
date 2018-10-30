@@ -48,7 +48,7 @@ int main ()
   //Cria os tanques do jogadores
   for(int id = 0; id < n_clientes ; id++){
     
-    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.025 , id);
+    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.05 , id);
     ldt->addTanque(tanque);
   }
 
@@ -67,6 +67,8 @@ int main ()
   std::string ldbSerial;
   std::string ldtSerial;
 
+  servidor->initReceberComando(jogadores);
+
   t1 = get_now_ms();
 
   while (1) {
@@ -74,6 +76,7 @@ int main ()
     t0 = t1;
     t1 = get_now_ms();
     deltaT = t1-t0;
+    //std::cout << "Tempo total: " << deltaT << std::endl;
 
     // Atualiza modelo
     f->update(deltaT);
@@ -96,29 +99,21 @@ int main ()
 
     //Envia a lista de tanques
     servidor->transmitirLista(ldtSerial , jogadores);
-
-    t3 = get_now_ms();
-    //Recebe comandos dos clientes
-    servidor->receberComando(jogadores);
-
     
     //Verifica os comandos dos jogadores
     for(size_t i = 0; i < jogadores.size(); i++){
       if(jogadores[i].comando == 'q'){
+        jogadores[i].threadJogador.join();
         ldt->removeTanque(jogadores[i].id);
         close(jogadores[i].conexao_fd);
         jogadores.erase(jogadores.begin() + i);
-        i--;
       } else {
+        //std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n'" ;
         Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
+        jogadores[i].comando = '0';
         if(novaBala != NULL) ldb->addBala(novaBala);
       }
     }
-
-    t4 = get_now_ms();
-    deltaT2 = t4-t3;
-
-    std::cout << "Tempo: " << deltaT2 << std::endl;
     
     if(jogadores.size() == 0) break;
 
@@ -128,14 +123,12 @@ int main ()
         periodo = 0;
     }
 
-    //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     periodo++;
   }
 
   //Encerra o programa
-  //servidor->stopTodos(jogadores);
-  delete servidor;
-
+  servidor->stop();
 
   return 0;
 }

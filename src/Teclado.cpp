@@ -12,14 +12,15 @@ void threadFunction(Rede::Cliente *cliente, char *keybuffer, int *control)
   while ((*control) == 1) {
     c = getch();
     if (c!=ERR)
-    {
+    { 
+      std::cerr << "Enviando comando =  '" << c << "'\n";
       (*keybuffer) = c;
       if ((cliente->enviarComando(c)) <= 0) {
         std::cerr << "Erro ao enviar comando ao servidor\n";
       }
     } 
     else (*keybuffer) = 0;
-    std::this_thread::sleep_for (std::chrono::milliseconds(20));
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
   return;
 }
