@@ -47,7 +47,7 @@ int main ()
 
   //Cria os tanques do jogadores
   for(int id = 0; id < n_clientes ; id++){
-    
+
     Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.05 , id);
     ldt->addTanque(tanque);
   }
@@ -106,7 +106,7 @@ int main ()
 
     //Envia a lista de tanques
     servidor->transmitirLista(ldtSerial , jogadores);
-    
+
     //Verifica os comandos dos jogadores
     for(size_t i = 0; i < jogadores.size(); i++){
       if(jogadores[i].comando == 'q'){
@@ -119,6 +119,8 @@ int main ()
         for(int k = 0; k < jogadores.size(); k++){
           std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
         }
+        
+        i--;
 
       } else {
         if(jogadores[i].comando != '0')std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
@@ -127,7 +129,7 @@ int main ()
         if(novaBala != NULL) ldb->addBala(novaBala);
       }
     }
-    
+
     if(jogadores.size() == 0) break;
 
     // Recarrega os tanques periodicamente
