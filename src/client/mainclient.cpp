@@ -11,8 +11,8 @@
 
 
 //Tamanho da janela de jogo
-#define MAXX 30
-#define MAXY 60
+#define MAXX 10
+#define MAXY 20
 
 //Pega o tempo em milisegundos
 using namespace std::chrono;
@@ -40,7 +40,7 @@ int main ()
   std::cout << "Conectado com o id " << (int) id << std::endl;
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  
+
 
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
@@ -51,7 +51,7 @@ int main ()
 
   //Inicializa o teclado
   Teclado *teclado = new Teclado();
-  teclado->init(cliente);
+  teclado->init();
 
   //Limpa eventuais comandos pre-buffered
   teclado->getChar();
@@ -86,14 +86,18 @@ int main ()
 
 	// Lê o teclado e envia o comando ao servidor (via thread agora)
 	char c = teclado->getChar();
+    if(c != 0) {
+        cliente->enviarComando(c);
+    }
 	if(c == 'q'){
 		break;
 	}
 
 }
 
-tela->stop();
+teclado->getChar();
 teclado->stop();
+tela->stop();
 cliente->stop();
 std::cerr << "Fim de jogo\n";
 

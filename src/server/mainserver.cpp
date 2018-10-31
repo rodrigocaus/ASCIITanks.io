@@ -9,8 +9,8 @@
 #include "../Cor.hpp"
 
 //Tamanho da janela de jogo
-#define MAXX 30
-#define MAXY 60
+#define MAXX 10
+#define MAXY 20
 
 #define MAX_JOGADORES 3
 
@@ -119,13 +119,13 @@ int main ()
         for(int k = 0; k < jogadores.size(); k++){
           std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
         }
-        
+
         i--;
 
       } else {
-        if(jogadores[i].comando != '0')std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
+        if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
         Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
-        jogadores[i].comando = '0';
+        jogadores[i].comando = 0;
         if(novaBala != NULL) ldb->addBala(novaBala);
       }
     }
