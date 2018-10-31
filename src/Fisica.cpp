@@ -50,7 +50,7 @@ void Fisica::update(float deltaT) {
     novaPosicao = (*b)[i]->getPosicao();
     novaPosicao.x = novaPosicao.x + ((*b)[i]->getVelocidade()).x * deltaT;
     novaPosicao.y = novaPosicao.y + ((*b)[i]->getVelocidade()).y * deltaT;
-    
+
     // Fora dos limites, a bala é destruida
     if(novaPosicao.x > this->maxX || novaPosicao.y > this->maxY
         || novaPosicao.x < 0 || novaPosicao.y < 0) {
