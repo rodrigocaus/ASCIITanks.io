@@ -8,9 +8,8 @@
 
 #include <ncurses.h>
 #include "model.hpp"
-#include "Rede.hpp"
 
-void threadFunction(Rede::Cliente *cliente , char *keybuffer, int *control);
+void threadFunction(char *keybuffer, int *control);
 
 class Teclado {
   private:
@@ -22,7 +21,7 @@ class Teclado {
     Teclado();
     ~Teclado();
     void stop();
-    void init(Rede::Cliente *cliente);
+    void init();
     char getChar();
 };
 
