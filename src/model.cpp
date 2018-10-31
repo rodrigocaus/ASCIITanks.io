@@ -117,9 +117,6 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
           this->updateDirecao('d');
           this->updateVelocidade({0.0, (this->velocidadePadrao)});
           break;
-        case '0':
-          this->updateVelocidade({0.0, 0.0});
-          break;
         case ' ':
           //Atira bala
           if(this->balaAtual > 0) {
@@ -334,7 +331,7 @@ ListaDeTanques::~ListaDeTanques() {
 
 
   Bala *ListaDeTanques::comandaTanque(int id, char c) {
-  
+
     Bala * bala;
     for(int i = 0 ; i < (this->tanques)->size() ; i++)
     {
@@ -405,18 +402,18 @@ ListaDeTanques::~ListaDeTanques() {
 	 int balaAtual;
 	 int balaMax;
 	 float velocidadePadrao;
-	 int timeInimigo;
+	 int id;
 	 char *s = (char *)buffer_entrada.c_str();
 	 while 	(\
 		 		sscanf(s, "%f,%f,%f,%f,%d,%d,%d,%d,%f,%d\n", \
 				&(vel.x), &(vel.y), &(pos.x), &(pos.y), \
 				&vida, &direcao, &balaAtual, &balaMax, \
-				&velocidadePadrao, &timeInimigo) \
+				&velocidadePadrao, &id) \
 			> 0)
 	{
 		 for (; *s != '\n'; s++);
 		 s++;
-		 Tanque *novoTanque = new Tanque(pos, vida, balaMax, (char) direcao, velocidadePadrao, (bool) timeInimigo);
+		 Tanque *novoTanque = new Tanque(pos, vida, balaMax, (char) direcao, velocidadePadrao, id);
 		 novoTanque->updateVelocidade(vel);
 		 novoTanque->updateBala(balaAtual);
 		 this->addTanque(novoTanque);
