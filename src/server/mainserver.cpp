@@ -67,7 +67,14 @@ int main ()
   std::string ldbSerial;
   std::string ldtSerial;
 
-  servidor->initReceberComando(jogadores);
+  //Inicializa a thread que assincronamente recebe os comandos dos clientes
+  servidor->initReceberComando(&jogadores);
+
+  //PRINT PARA DEBUG APENAS
+  std::cout << "Jogadores no vector: \n";
+  for(int k = 0; k < jogadores.size(); k++){
+    std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
+  }
 
   t1 = get_now_ms();
 
@@ -103,12 +110,18 @@ int main ()
     //Verifica os comandos dos jogadores
     for(size_t i = 0; i < jogadores.size(); i++){
       if(jogadores[i].comando == 'q'){
-        jogadores[i].threadJogador.join();
         ldt->removeTanque(jogadores[i].id);
         close(jogadores[i].conexao_fd);
         jogadores.erase(jogadores.begin() + i);
+
+        //PRINT PARA DEBUG APENAS
+        std::cout << "Jogadores no vector: \n";
+        for(int k = 0; k < jogadores.size(); k++){
+          std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
+        }
+
       } else {
-        //std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n'" ;
+        if(jogadores[i].comando != '0')std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
         Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
         jogadores[i].comando = '0';
         if(novaBala != NULL) ldb->addBala(novaBala);

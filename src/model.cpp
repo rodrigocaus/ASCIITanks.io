@@ -326,7 +326,7 @@ ListaDeTanques::~ListaDeTanques() {
       if((*(this->tanques))[i]->getId() == id)
       {
         delete (*(this->tanques))[i];
-        (this->tanques)->erase((this->tanques)->begin() + id);
+        (this->tanques)->erase((this->tanques)->begin() + i);
         break;
       }
     }

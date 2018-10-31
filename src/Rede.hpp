@@ -23,10 +23,9 @@ struct jogador {
   int conexao_fd;
   char comando;
   std::string nome;
-  std::thread threadJogador;
 };
 
-void recebeComandos(int *conexao_fd , char *comando);
+void funcRecebeComandos(std::vector<jogador> * jogadores);
 
 namespace Rede {
 
@@ -34,7 +33,8 @@ class Servidor {
 
     private:
         int socket_fd;
-        struct sockaddr_in myself; 
+        struct sockaddr_in myself;
+        std::thread threadRecebeComandos;    
 
     public:
         Servidor();
@@ -44,7 +44,7 @@ class Servidor {
         void stop();
         void transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores);
         void transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores);
-        void initReceberComando(std::vector<jogador> & jogadores);
+        void initReceberComando(std::vector<jogador> * jogadores);
 };
 
 
