@@ -6,18 +6,17 @@
 #include "Rede.hpp"
 
 //Função que roda em thread e fica verificando comandos de um jogador e atualizando
-void funcRecebeComandos(std::vector<jogador> * jogadores)
+void funcRecebeComandos(std::vector<jogador> * jogadores, bool *editando, std::mutex *mtx)
 {
-  bool continua = true;	
-
-  while(continua){
-  	for(int i = 0 ; i < jogadores->size() ; i++){
-  		recv((*jogadores)[i].conexao_fd, &((*jogadores)[i].comando) , 1 , MSG_DONTWAIT);
-  		if(jogadores->size() == 0){ 
-  			continua = false; 
-  			break;
-  		}
-  	}
+  int i = 0;
+  while (jogadores->size() > 0) {
+      if (!(*editando)) {
+          mtx->lock();
+          recv((*jogadores)[i].conexao_fd, &((*jogadores)[i].comando) , 1 , MSG_DONTWAIT);
+          mtx->unlock();
+          i++;
+          if (i >= jogadores->size()) i = 0;
+      }
   }
   return;
 }
@@ -102,10 +101,10 @@ void Servidor::transmitirTamanho(size_t * tamListas , std::vector<jogador> & jog
 	}
 }
 
-void Servidor::initReceberComando(std::vector<jogador> * jogadores)
+void Servidor::initReceberComando(std::vector<jogador> * jogadores, bool *editando, std::mutex *mtx)
 {
 	//Recebendo comandos dos jogadores
-	(this->threadRecebeComandos)  = std::thread(funcRecebeComandos, jogadores);
+	(this->threadRecebeComandos)  = std::thread(funcRecebeComandos, jogadores, editando, mtx);
 }
 
 Cliente::Cliente() {}

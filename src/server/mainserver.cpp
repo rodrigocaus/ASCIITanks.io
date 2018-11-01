@@ -20,10 +20,12 @@ uint64_t get_now_ms() {
   return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-int main ()
+int main (int argc, char *argv[])
 {
 
   std::vector<jogador> jogadores;
+  bool editando;
+  std::mutex mtx;
 
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
@@ -57,10 +59,7 @@ int main ()
 
   uint64_t t0;
   uint64_t t1;
-  uint64_t t3;
-  uint64_t t4;
   uint64_t deltaT;
-  uint64_t deltaT2;
   int periodo = 0;
 
   //String que receberá a serialização das listas de balas e tanques
@@ -68,7 +67,7 @@ int main ()
   std::string ldtSerial;
 
   //Inicializa a thread que assincronamente recebe os comandos dos clientes
-  servidor->initReceberComando(&jogadores);
+  servidor->initReceberComando(&jogadores, &editando, &mtx);
 
   //PRINT PARA DEBUG APENAS
   std::cout << "Jogadores no vector: \n";
@@ -108,32 +107,37 @@ int main ()
     servidor->transmitirLista(ldtSerial , jogadores);
 
     //Verifica os comandos dos jogadores
-    for(size_t i = 0; i < jogadores.size(); i++){
-      if(jogadores[i].comando == 'q'){
-        ldt->removeTanque(jogadores[i].id);
-        close(jogadores[i].conexao_fd);
-        jogadores.erase(jogadores.begin() + i);
+    for(size_t i = 0; i < jogadores.size(); i++) {
+        if (jogadores[i].comando == 'q') {
 
-        //PRINT PARA DEBUG APENAS
-        std::cout << "Jogadores no vector: \n";
-        for(int k = 0; k < jogadores.size(); k++){
-          std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
-        }
+            ldt->removeTanque(jogadores[i].id);
+            editando = true;
+            mtx.lock();
+            close(jogadores[i].conexao_fd);
+            jogadores.erase(jogadores.begin() + i);
+            mtx.unlock();
+            editando = false;
 
-        i--;
+            //PRINT PARA DEBUG APENAS
+            std::cout << "Jogadores no vector: \n";
+            for (int k = 0; k < jogadores.size(); k++) {
+                std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
+            }
 
-      } else {
-        if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
-        Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
-        jogadores[i].comando = 0;
-        if(novaBala != NULL) ldb->addBala(novaBala);
+            i--;
+
+        } else {
+            if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
+            Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
+            jogadores[i].comando = 0;
+            if(novaBala != NULL) ldb->addBala(novaBala);
       }
     }
 
     if(jogadores.size() == 0) break;
 
     // Recarrega os tanques periodicamente
-    if (periodo == 50) {
+    if (periodo == 100) {
         ldt->incrementaMunicao(); //Recarrega
         periodo = 0;
     }

@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <mutex>
 
 struct jogador {
   int id;
@@ -25,7 +26,7 @@ struct jogador {
   std::string nome;
 };
 
-void funcRecebeComandos(std::vector<jogador> * jogadores);
+void funcRecebeComandos(std::vector<jogador> *jogadores, bool *editando, std::mutex *mtx);
 
 namespace Rede {
 
@@ -34,7 +35,7 @@ class Servidor {
     private:
         int socket_fd;
         struct sockaddr_in myself;
-        std::thread threadRecebeComandos;    
+        std::thread threadRecebeComandos;
 
     public:
         Servidor();
@@ -44,7 +45,7 @@ class Servidor {
         void stop();
         void transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores);
         void transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores);
-        void initReceberComando(std::vector<jogador> * jogadores);
+        void initReceberComando(std::vector<jogador> * jogadores, bool *editando, std::mutex *mtx);
 };
 
 
