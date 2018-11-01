@@ -25,9 +25,19 @@ void Tela::init() {
 
   start_color();
   // Cor de fundo da janela como branco e texto em preto
-  init_pair(1, COLOR_BLACK, COLOR_WHITE);
-  // Cor para gerar tanques de outro time
-  init_pair(2, COLOR_RED, COLOR_WHITE);
+  init_pair(Cor::preto + 1, COLOR_BLACK, COLOR_WHITE);
+  // Cor de fundo da janela como branco e texto em vermelho
+  init_pair(Cor::vermelho + 1, COLOR_RED, COLOR_WHITE);
+  // Cor de fundo da janela como branco e texto em verde
+  init_pair(Cor::verde + 1, COLOR_GREEN, COLOR_WHITE);
+  // Cor de fundo da janela como branco e texto em 'amarelo'
+  init_pair(Cor::amarelo + 1, COLOR_YELLOW, COLOR_WHITE);
+  // Cor de fundo da janela como branco e texto em azul
+  init_pair(Cor::azul + 1, COLOR_BLUE, COLOR_WHITE);
+  // Cor de fundo da janela como branco e texto em magenta
+  init_pair(Cor::magenta + 1, COLOR_MAGENTA, COLOR_WHITE);
+  // Cor de fundo da janela como branco e texto em ciano
+  init_pair(Cor::ciano + 1, COLOR_CYAN, COLOR_WHITE);
 
   //Limpa a tela para remover qualquer coisa que tenha
   erase();
@@ -62,10 +72,8 @@ void Tela::update() {
 
     wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
 
-    //Colore o tanque de vermelho se for inimigo e preto se for a gente
-    if((*tanques)[k]->getId() == 0){
-        wattron(this->janelaDeJogo, COLOR_PAIR(2));
-    }
+    //Colore o tanque
+    wattron(this->janelaDeJogo, COLOR_PAIR((*tanques)[k]->getId()+1));
 
     //Desenha o tanque com setas diferentes dependendo da posição apontada
     char dir = (*tanques)[k]->getDirecao();
@@ -87,9 +95,9 @@ void Tela::update() {
             waddch(this->janelaDeJogo, 'e');
             break;
     }
-    if((*tanques)[k]->getId() == 0){
-        wattroff(this->janelaDeJogo, COLOR_PAIR(2));
-    }
+
+    wattroff(this->janelaDeJogo, COLOR_PAIR((*tanques)[k]->getId()+1));
+
   }
   // Atualiza tela
   wrefresh(this->janelaDeJogo);
