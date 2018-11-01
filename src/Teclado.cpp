@@ -11,9 +11,7 @@ void threadFunction(char *keybuffer, int *control)
   char c;
   while ((*control) == 1) {
     c = getch();
-    if (c!=ERR)
-    {
-      std::cerr << "Enviando comando =  '" << c << "'\n";
+    if (c!=ERR) {
       (*keybuffer) = c;
     }
     else (*keybuffer) = 0;
