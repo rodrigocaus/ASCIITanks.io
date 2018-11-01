@@ -95,11 +95,10 @@ int main ()
 
 }
 
-teclado->getChar();
 teclado->stop();
 tela->stop();
 cliente->stop();
-std::cerr << "Fim de jogo\n";
+std::cout << "Fim de jogo\n";
 
 return 0;
 
