@@ -6,18 +6,20 @@
 #include "Teclado.hpp"
 
 //Função que roda em thread verificando input de teclado e salvando a ultima tecla registrada
-void threadFunction(char *keybuffer, int *control)
+void threadFunction(char *keybuffer)
 {
   char c;
-  while ((*control) == 1) {
+  while (1) {
     c = getch();
     if (c!=ERR) {
       (*keybuffer) = c;
+      if(c == 'q') return;
     }
     else (*keybuffer) = 0;
     std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
   return;
+
 }
 
 Teclado::Teclado() {
@@ -33,12 +35,10 @@ void Teclado::init() {
   noecho();			         /* Don't echo() while we do getch */
   curs_set(0);           /* Do not display cursor */
 
-  this->rodando = 1;
-  (this->kbThread) = std::thread(threadFunction, &(this->ultimaCaptura), &(this->rodando));
+  (this->kbThread) = std::thread(threadFunction, &(this->ultimaCaptura));
 }
 
 void Teclado::stop() {
-  this->rodando = 0;
   (this->kbThread).join();
 }
 

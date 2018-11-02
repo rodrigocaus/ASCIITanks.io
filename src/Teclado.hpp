@@ -9,12 +9,11 @@
 #include <ncurses.h>
 #include "model.hpp"
 
-void threadFunction(char *keybuffer, int *control);
+void threadFunction(char *keybuffer);
 
 class Teclado {
   private:
     char ultimaCaptura;
-    int rodando;
     std::thread kbThread;
 
   public:

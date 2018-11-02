@@ -117,14 +117,13 @@ int main (int argc, char *argv[])
             jogadores.erase(jogadores.begin() + i);
             mtx.unlock();
             editando = false;
+            i--;
 
             //PRINT PARA DEBUG APENAS
             std::cout << "Jogadores no vector: \n";
             for (int k = 0; k < jogadores.size(); k++) {
                 std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
             }
-
-            i--;
 
         } else {
             if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;

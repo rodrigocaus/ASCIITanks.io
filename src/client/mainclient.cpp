@@ -84,20 +84,22 @@ int main ()
 	// Atualiza tela
 	tela->update();
 
-	// Lê o teclado e envia o comando ao servidor (via thread agora)
+	// Lê o teclado e envia o comando ao servidor
 	char c = teclado->getChar();
     if(c != 0) {
         cliente->enviarComando(c);
     }
 	if(c == 'q'){
+		if(c == 'q') std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		break;
 	}
 
 }
 
-teclado->stop();
-tela->stop();
+
 cliente->stop();
+tela->stop();
+teclado->stop();
 std::cout << "Fim de jogo\n";
 
 return 0;

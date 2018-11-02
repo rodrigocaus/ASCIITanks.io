@@ -177,5 +177,7 @@ void Cliente::receberTamanho(size_t * ldbTam , size_t * ldtTam)
 
 int Cliente::enviarComando(char c)
 {
-	return send(socket_fd, &c , sizeof(char) , 0);
+
+	int retorno = send(socket_fd, &c , sizeof(char) , 0);
+	return retorno;
 }
