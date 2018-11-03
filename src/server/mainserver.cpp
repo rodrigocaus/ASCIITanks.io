@@ -26,16 +26,9 @@ int main (int argc, char *argv[])
   ListaDeTanques *ldt = new ListaDeTanques();
 
   // Implementação do sistema de matchmaking
+  //Pergunta e valida a resposta sobre quantos jogarores terao
   int n_clientes;
   std::string nome_jogador;
-
-  /*std::cout << "Digite o numero de jogadores: ";
-  std::cin >> n_clientes >> std::endl;
-  while(n_clientes <= 0 || n_clientes > MAX_JOGADORES) {
-      std::cout << "Digite um valor positivo e menor ou igual a " << MAX_JOGADORES << std::endl;
-      std::cin >> n_clientes >> std::endl;
-  }*/
-
   while(1){
     std::cout << "Digite o numero de jogadores: ";
     if (std::cin >> n_clientes && n_clientes <= MAX_JOGADORES) {
@@ -48,9 +41,27 @@ int main (int argc, char *argv[])
   }
 
   //Inicialização do socket e aguarda contato do jogador
+  //Pergunta pelo endereco IP do servidor para poder configuirar o socket
+  //Ou pula essa etapa se o IP ja estiver passado como parametro argv
   Rede::Servidor * servidor = new Rede::Servidor();
-  servidor->config();
+  std::string endereco_ip;
 
+  if(argc < 2){
+    while(1){
+      std::cout << "Digite o endereco IP desse servidor no formato xxx.xxx.xxx.xxx: ";
+      if (std::cin >> endereco_ip && servidor->config(endereco_ip.c_str())) {
+          break;
+      } else {
+          std::cout << "O IP nao esta em um formato valido !" << std::endl;
+          std::cin.clear();
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      }
+    }
+  } else {
+    servidor->config(argv[1]);
+  }
+  std::cout << "Aguardando conexao dos clientes ..." << std::endl;
+ 
   //Conecta os clientes, construindo as structs jogadores com informações de nome e id
   servidor->conectaClientes(n_clientes , jogadores);
 
@@ -110,6 +121,7 @@ int main (int argc, char *argv[])
     for(size_t i = 0; i < jogadores.size(); i++) {
         if (jogadores[i].ativo == false) {
 
+            std::cout << "Jogador " << jogadores[i].nome << " saiu da partida" << std::endl;
             ldt->removeTanque(jogadores[i].id);
             close(jogadores[i].conexao_fd);
             jogadores.erase(jogadores.begin() + i);
@@ -117,7 +129,7 @@ int main (int argc, char *argv[])
             i--;
 
         } else {
-            //if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
+
             Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
             jogadores[i].comando = 0;
             if(novaBala != NULL) ldb->addBala(novaBala);
@@ -138,6 +150,7 @@ int main (int argc, char *argv[])
 
   //Encerra o programa
   servidor->stop();
+  std::cout << "Fim de jogo" << std::endl;
 
   return 0;
 }
