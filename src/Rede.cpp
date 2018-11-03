@@ -34,7 +34,11 @@ void Servidor::stop()
 	threadRecebeComandos.join();
 }
 
-void Servidor::config() {
+int Servidor::config(const char * endereco_ip) {
+
+	//Converte o meu endereço IP na forma de string para forma da struct
+	int conversao = inet_aton(endereco_ip, &(myself.sin_addr));
+	if(conversao == 0)return 0;
 
 	//Socket criado com IPv4 e TCP/IP
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -42,9 +46,6 @@ void Servidor::config() {
 	//Configurando o meu socket para IPv4 e porta 3001
 	myself.sin_family = AF_INET;
 	myself.sin_port = htons(3001);
-
-	//Converte o meu endereço IP na forma de string para forma da struct
-	inet_aton("25.14.198.34", &(myself.sin_addr));
 
 	//Tenta ligar a porta desejada ao nosso socket
 	if (bind(this->socket_fd, (struct sockaddr*)&myself, sizeof(myself)) != 0) {
@@ -54,6 +55,7 @@ void Servidor::config() {
 	//Servidor aberto para requisição de comunicação
 	listen(socket_fd, 2);
 	std::cerr << "Ouvindo\n";
+	return 1;
 
 }
 
@@ -71,10 +73,10 @@ void Servidor::conectaClientes(int n_clientes , std::vector<jogador> & jogadores
       jogadores[i].id = i;
       jogadores[i].ativo = true;
       send(jogadores[i].conexao_fd, &(jogadores[i].id), sizeof(int), 0);
-      std::cerr << nome << " se conectou\n";
-      std::cerr << "Aguardando " << (n_clientes - i - 1) << " jogadores\n";
+      std::cout << nome << " se conectou\n";
+      std::cout << "Aguardando " << (n_clientes - i - 1) << " jogadores\n";
   	}
-  	std::cerr << "Iniciando Partida\n";
+  	std::cout << "Iniciando Partida\n";
 }
 
 void Servidor::transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores)
@@ -118,7 +120,11 @@ void Cliente::stop()
 	close(socket_fd);
 }
 
-void Cliente::config() {
+int Cliente::config(const char * endereco_ip) {
+
+	//Converte o meu endereço IP na forma de string para forma da struct
+	int conversao = inet_aton(endereco_ip, &(target.sin_addr));
+	if(conversao == 0) return 0;
 
 	//Socket criado com IPv4 e TCP/IP
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -126,16 +132,15 @@ void Cliente::config() {
 	//Configurando o meu socket para IPv4 e porta 3001
 	target.sin_family = AF_INET;
 	target.sin_port = htons(3001);
+	return 1;
 
-	//Converte o meu endereço IP na forma de string para forma da struct
-	inet_aton("25.14.198.34", &(target.sin_addr));
 }
 
 void Cliente::conecta(std::string &nome_cliente, size_t *id_cliente) {
 
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
-    	std::cerr << "Erro em conectar com o servidor\n";
+    	std::cout << "Erro em conectar com o servidor\n";
     	exit(0);
     } else {
 		char nome[21] = {0};
