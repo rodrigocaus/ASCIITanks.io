@@ -21,13 +21,13 @@ noaudio: $(CLIENT_HPP) $(CLIENT_SRC) $(CLIENT_MAIN)
 	g++ $(CLIENT_SRC) $(CLIENT_MAIN) -o $(GAME) $(FLAGS) -UAUDIOON
 
 play: $(GAME)
-	./$(GAME) 2>game.log
+	./$(GAME) 127.0.0.1 2>game.log
 
 $(SERVER): $(SERVER_HPP) $(SERVER_SRC) $(SERVER_MAIN)
 	g++ $(SERVER_SRC) $(SERVER_MAIN) -o $(SERVER) $(FLAGS)
 
 server: $(SERVER)
-	./$(SERVER) 2>server.log
+	./$(SERVER) 127.0.0.1 2>server.log
 
 clear:
 	rm -f $(GAME) $(SERVER) game.log server.log
