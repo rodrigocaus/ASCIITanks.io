@@ -15,14 +15,10 @@ uint64_t get_now_ms() {
   return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-int main ()
+int main(int argc, char *argv[])
 {
 
-  // Cria o objeto responsável por receber o estado de jogo da rede
-  Rede::Cliente * cliente = new Rede::Cliente();
-  cliente->config();
-
-  // Fazemos o processo de conexão
+  //Obtendo e validando o nome do jogador
   std::string nome;
   int id;
   do {
@@ -30,13 +26,34 @@ int main ()
 	  std::cin >> nome;
   } while(nome.length() > 20);
 
+  //Criando o objeto de cliente da rede
+  Rede::Cliente * cliente = new Rede::Cliente();
+  std::string endereco_ip;
+
+  //Configurando a conexao
+  //Pergunta pelo endereco IP do servidor para poder configuirar o socket
+  //Ou pula essa etapa se o IP ja estiver passado como parametro argv
+  if(argc < 2){
+    while(1){
+      std::cout << "Digite o endereco IP do servidor que deseja se conectar no formato xxx.xxx.xxx.xxx: ";
+      if (std::cin >> endereco_ip && cliente->config(endereco_ip.c_str())) {
+          break;
+      } else {
+          std::cout << "O IP nao esta em um formato valido !" << std::endl;
+          std::cin.clear();
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      }
+    }
+  } else {
+    cliente->config(argv[1]);
+  }
+  
+  //Estabelece a conexao com o servidor
   cliente->conecta(nome, (size_t *) &id);
-
   std::cout << "Conectado com o id " << (int) id << std::endl;
-
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-
+  //Cria as listas de balas e tanques
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
 
