@@ -9,11 +9,6 @@
 #include "../Teclado.hpp"
 #include "../Tela.hpp"
 
-
-//Tamanho da janela de jogo
-#define MAXX 10
-#define MAXY 20
-
 //Pega o tempo em milisegundos
 using namespace std::chrono;
 uint64_t get_now_ms() {
@@ -39,7 +34,7 @@ int main ()
 
   std::cout << "Conectado com o id " << (int) id << std::endl;
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 
   ListaDeBalas *ldb = new ListaDeBalas();
@@ -90,7 +85,6 @@ int main ()
         cliente->enviarComando(c);
     }
 	if(c == 'q'){
-		if(c == 'q') std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		break;
 	}
 

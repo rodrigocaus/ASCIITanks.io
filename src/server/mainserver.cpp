@@ -8,10 +8,6 @@
 #include "../Rede.hpp"
 #include "../Cor.hpp"
 
-//Tamanho da janela de jogo
-#define MAXX 10
-#define MAXY 20
-
 #define MAX_JOGADORES 3
 
 //Pega o tempo em milisegundos
@@ -24,8 +20,7 @@ int main (int argc, char *argv[])
 {
 
   std::vector<jogador> jogadores;
-  bool editando;
-  std::mutex mtx;
+  bool deletar = false;
 
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
@@ -50,7 +45,7 @@ int main (int argc, char *argv[])
   //Cria os tanques do jogadores
   for(int id = 0; id < n_clientes ; id++){
 
-    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.05 , id);
+    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.1 , id);
     ldt->addTanque(tanque);
   }
 
@@ -67,7 +62,7 @@ int main (int argc, char *argv[])
   std::string ldtSerial;
 
   //Inicializa a thread que assincronamente recebe os comandos dos clientes
-  servidor->initReceberComando(&jogadores, &editando, &mtx);
+  servidor->initReceberComando(&jogadores, &deletar);
 
   //PRINT PARA DEBUG APENAS
   std::cout << "Jogadores no vector: \n";
@@ -82,8 +77,7 @@ int main (int argc, char *argv[])
     t0 = t1;
     t1 = get_now_ms();
     deltaT = t1-t0;
-    //std::cout << "Tempo total: " << deltaT << std::endl;
-
+    
     // Atualiza modelo
     f->update(deltaT);
 
@@ -94,7 +88,7 @@ int main (int argc, char *argv[])
     ldb->serializaLista(ldbSerial);
     ldt->serializaLista(ldtSerial);
 
-    //Tamanho das listas geradas
+    //Tamanho das listas geradasw
     size_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
 
     //Envia os tamanhos das listas para os clientes saberem o quanto deve receber
@@ -108,29 +102,20 @@ int main (int argc, char *argv[])
 
     //Verifica os comandos dos jogadores
     for(size_t i = 0; i < jogadores.size(); i++) {
-        if (jogadores[i].comando == 'q') {
+        if (jogadores[i].ativo == false) {
 
             ldt->removeTanque(jogadores[i].id);
-            editando = true;
-            mtx.lock();
             close(jogadores[i].conexao_fd);
             jogadores.erase(jogadores.begin() + i);
-            mtx.unlock();
-            editando = false;
+            deletar = false;
             i--;
-
-            //PRINT PARA DEBUG APENAS
-            std::cout << "Jogadores no vector: \n";
-            for (int k = 0; k < jogadores.size(); k++) {
-                std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
-            }
 
         } else {
             if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
             Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
             jogadores[i].comando = 0;
             if(novaBala != NULL) ldb->addBala(novaBala);
-      }
+        }
     }
 
     if(jogadores.size() == 0) break;
@@ -141,7 +126,7 @@ int main (int argc, char *argv[])
         periodo = 0;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
     periodo++;
   }
 

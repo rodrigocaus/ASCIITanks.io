@@ -23,10 +23,11 @@ struct jogador {
   int id;
   int conexao_fd;
   char comando;
+  bool ativo;
   std::string nome;
 };
 
-void funcRecebeComandos(std::vector<jogador> *jogadores, bool *editando, std::mutex *mtx);
+void funcRecebeComandos(std::vector<jogador> *jogadores, bool *deletar);
 
 namespace Rede {
 
@@ -45,7 +46,7 @@ class Servidor {
         void stop();
         void transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores);
         void transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores);
-        void initReceberComando(std::vector<jogador> * jogadores, bool *editando, std::mutex *mtx);
+        void initReceberComando(std::vector<jogador> * jogadores, bool *deletar);
 };
 
 

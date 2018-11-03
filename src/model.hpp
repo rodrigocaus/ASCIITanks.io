@@ -14,6 +14,10 @@
 #include <vector>
 #include <random>
 
+//Tamanho da janela de jogo
+#define MAXX 30
+#define MAXY 60
+
 
 typedef struct {
 	float x;
