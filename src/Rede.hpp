@@ -41,7 +41,7 @@ class Servidor {
     public:
         Servidor();
         ~Servidor();
-        void config();
+        int config(const char * endereco_ip);
         void conectaClientes(int id_cliente , std::vector<jogador> & jogadores);
         void stop();
         void transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores);
@@ -59,7 +59,7 @@ class Cliente {
     public:
         Cliente();
         ~Cliente();
-        void config();
+        int config(const char * endereco_ip);
         void conecta(std::string &nome_cliente, size_t *id_cliente);
         void stop();
         void receberLista(std::string & buf, size_t tamanho);
