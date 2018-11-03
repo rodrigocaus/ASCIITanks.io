@@ -44,7 +44,7 @@ void Servidor::config() {
 	myself.sin_port = htons(3001);
 
 	//Converte o meu endereço IP na forma de string para forma da struct
-	inet_aton("127.0.0.1", &(myself.sin_addr));
+	inet_aton("25.14.198.34", &(myself.sin_addr));
 
 	//Tenta ligar a porta desejada ao nosso socket
 	if (bind(this->socket_fd, (struct sockaddr*)&myself, sizeof(myself)) != 0) {
@@ -128,7 +128,7 @@ void Cliente::config() {
 	target.sin_port = htons(3001);
 
 	//Converte o meu endereço IP na forma de string para forma da struct
-	inet_aton("127.0.0.1", &(target.sin_addr));
+	inet_aton("25.14.198.34", &(target.sin_addr));
 }
 
 void Cliente::conecta(std::string &nome_cliente, size_t *id_cliente) {

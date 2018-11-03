@@ -15,8 +15,8 @@
 #include <random>
 
 //Tamanho da janela de jogo
-#define MAXX 30
-#define MAXY 60
+#define MAXX 20
+#define MAXY 30
 
 
 typedef struct {
@@ -33,7 +33,7 @@ class Bala {
 
   public:
   Bala(Coordenada velocidade, Coordenada posicao);
-  Bala(char direcao, Coordenada posicao , float velocidadePadrao = 0.05);
+  Bala(char direcao, Coordenada posicao , float velocidadePadrao = 0.03);
   void updatePosicao(Coordenada novaPosicao);
 
   Coordenada getVelocidade();

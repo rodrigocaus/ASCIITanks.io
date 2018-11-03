@@ -8,7 +8,7 @@
 #include "../Rede.hpp"
 #include "../Cor.hpp"
 
-#define MAX_JOGADORES 3
+#define MAX_JOGADORES 4
 
 //Pega o tempo em milisegundos
 using namespace std::chrono;
@@ -28,11 +28,23 @@ int main (int argc, char *argv[])
   // Implementação do sistema de matchmaking
   int n_clientes;
   std::string nome_jogador;
-  std::cout << "Digite o numero de jogadores: ";
-  std::cin >> n_clientes;
+
+  /*std::cout << "Digite o numero de jogadores: ";
+  std::cin >> n_clientes >> std::endl;
   while(n_clientes <= 0 || n_clientes > MAX_JOGADORES) {
       std::cout << "Digite um valor positivo e menor ou igual a " << MAX_JOGADORES << std::endl;
-      std::cin >> n_clientes;
+      std::cin >> n_clientes >> std::endl;
+  }*/
+
+  while(1){
+    std::cout << "Digite o numero de jogadores: ";
+    if (std::cin >> n_clientes && n_clientes <= MAX_JOGADORES) {
+        break;
+    } else {
+        std::cout << "Digite um valor positivo e menor ou igual a " << MAX_JOGADORES << std::endl;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
   }
 
   //Inicialização do socket e aguarda contato do jogador
@@ -45,7 +57,7 @@ int main (int argc, char *argv[])
   //Cria os tanques do jogadores
   for(int id = 0; id < n_clientes ; id++){
 
-    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.1 , id);
+    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.12 , id);
     ldt->addTanque(tanque);
   }
 
@@ -63,12 +75,6 @@ int main (int argc, char *argv[])
 
   //Inicializa a thread que assincronamente recebe os comandos dos clientes
   servidor->initReceberComando(&jogadores, &deletar);
-
-  //PRINT PARA DEBUG APENAS
-  std::cout << "Jogadores no vector: \n";
-  for(int k = 0; k < jogadores.size(); k++){
-    std::cout << "Nome: " << jogadores[k].nome << " ID: " << jogadores[k].id << "\n" ;
-  }
 
   t1 = get_now_ms();
 
@@ -111,7 +117,7 @@ int main (int argc, char *argv[])
             i--;
 
         } else {
-            if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
+            //if(jogadores[i].comando != 0) std::cout << "Comando do tanque " << jogadores[i].nome << " é '" << jogadores[i].comando <<"'\n" ;
             Bala *novaBala = ldt->comandaTanque(jogadores[i].id , jogadores[i].comando);
             jogadores[i].comando = 0;
             if(novaBala != NULL) ldb->addBala(novaBala);
@@ -126,7 +132,7 @@ int main (int argc, char *argv[])
         periodo = 0;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     periodo++;
   }
 
