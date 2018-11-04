@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
   //Cria os tanques do jogadores
   for(int id = 0; id < n_clientes ; id++){
 
-    Tanque *tanque = new Tanque({10.0, 10.0}, 3, 3, 'd' , 0.12 , id);
+    Tanque *tanque = new Tanque({(float)3.0*id, (float)6.0*id}, 3, 3, 'd' , 0.12 , id, 0);
     ldt->addTanque(tanque);
   }
 
