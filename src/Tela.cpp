@@ -17,11 +17,14 @@ Tela::Tela(ListaDeTanques *ldt, ListaDeBalas *ldb, int maxI, int maxJ) {
   this->maxJ = maxJ;
 }
 
-void Tela::init() {
+void Tela::init(int id) {
   initscr();			   /* Start curses mode 	 */
   raw();				  /* Line buffering disabled*/
   curs_set(0);           /* Do not display cursor  */
+
+  this->id = id;
   this->janelaDeJogo = newwin(this->maxI+1, this->maxJ+1, 0, 0);
+  this->janelaInfoJogador = newwin(3, this->maxJ+1 , this->maxI+1, 0);
 
   start_color();
   // Cor de fundo da janela como branco e texto em preto
@@ -43,6 +46,8 @@ void Tela::init() {
   erase();
   //Depois colore a tela com a cor branca
   wbkgd(this->janelaDeJogo, COLOR_PAIR(1));
+  wbkgd(this->janelaInfoJogador, COLOR_PAIR(1));
+  box(this->janelaInfoJogador, 0, 0);
   //E atualiza
   refresh();
 
@@ -68,8 +73,16 @@ void Tela::update() {
 
   for (int k=0; k<tanques->size(); k++)
   {
-    pos = ((*tanques)[k]->getPosicao());
 
+    //Desenhando o meu estado de jogo
+    if((*tanques)[k]->getId() == this->id){
+
+      wattron(this->janelaInfoJogador, COLOR_PAIR(this->id +1));
+      mvwprintw(this->janelaInfoJogador , 1, 1, "Meu tanque: Vidas: %d | Balas: %d" , (*tanques)[k]->getVida() , (*tanques)[k]->getBalaAtual() );
+      wattroff(this->janelaInfoJogador, COLOR_PAIR(this->id +1));
+    }
+
+    pos = ((*tanques)[k]->getPosicao());
     wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
 
     //Colore o tanque
@@ -99,8 +112,10 @@ void Tela::update() {
     wattroff(this->janelaDeJogo, COLOR_PAIR((*tanques)[k]->getId()+1));
 
   }
+
   // Atualiza tela
   wrefresh(this->janelaDeJogo);
+  wrefresh(this->janelaInfoJogador);
 }
 
 
