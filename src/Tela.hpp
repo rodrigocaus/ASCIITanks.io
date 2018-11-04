@@ -12,13 +12,14 @@ class Tela {
   private:
     ListaDeBalas *ldb;
     ListaDeTanques *ldt;
-    int maxI, maxJ;
+    int maxI, maxJ, id;
     WINDOW *janelaDeJogo;
+    WINDOW *janelaInfoJogador;
   public:
     Tela(ListaDeTanques *ldt, ListaDeBalas *ldb, int maxI, int maxJ);
     ~Tela();
     void stop();
-    void init();
+    void init(int id);
     void update();
     void imprimeVida(int v);
     void fimDeJogo();
