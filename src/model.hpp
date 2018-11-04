@@ -16,7 +16,7 @@
 
 //Tamanho da janela de jogo
 #define MAXX 20
-#define MAXY 30
+#define MAXY 40
 
 
 typedef struct {
