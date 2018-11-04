@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
   //Inicializa a tela
   Tela *tela = new Tela(ldt, ldb, MAXX, MAXY);
-  tela->init();
+  tela->init(id);
 
   //Inicializa o teclado
   Teclado *teclado = new Teclado();
