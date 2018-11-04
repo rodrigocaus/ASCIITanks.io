@@ -16,7 +16,7 @@
 
 //Tamanho da janela de jogo
 #define MAXX 20
-#define MAXY 40
+#define MAXY 60
 
 
 typedef struct {
@@ -53,18 +53,20 @@ class Tanque {
   int balaAtual;
   int balaMax;
   int id;
+  int mortes;
   char direcao;
   float velocidadePadrao;
   
 
   public:
-  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao , int id);
+  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao , int id, int mortes);
   Tanque(int maxX, int maxY , int id);
   void updatePosicao(Coordenada novaPosicao);
   void updateVelocidade(Coordenada novaVelocidade);
   void updateDirecao(char novaDirecao);
   void updateBala(int novaBalaAtual);
   void updateVida(int novaVida);
+  void updateMortes(int novaMorte);
 
   Coordenada getVelocidade();
   Coordenada getPosicao();
@@ -74,6 +76,7 @@ class Tanque {
   float getVelocidadePadrao();
   char getDirecao();
   int getId();
+  int getMortes();
 
   Bala *comando(char c);
 
