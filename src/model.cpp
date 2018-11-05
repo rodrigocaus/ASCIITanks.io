@@ -345,6 +345,15 @@ ListaDeTanques::~ListaDeTanques() {
     return (this->tanques);
   }
 
+  Tanque * ListaDeTanques::getTanque(int id){
+    for(int i = 0 ; i < (this->tanques)->size() ; i++){
+      if((*(this->tanques))[i]->getId() == id){
+        return (*(this->tanques))[i];
+      }
+    }
+    return NULL;
+  }
+
   void ListaDeTanques::removeTanque(int id) {
 
     for(int i = 0 ; i < (this->tanques)->size() ; i++)

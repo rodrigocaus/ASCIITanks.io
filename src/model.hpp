@@ -122,6 +122,7 @@ class ListaDeTanques {
     Bala * comandaTanque(int id , char c);
 	  void limpaLista();
     std::vector<Tanque *> *getTanques();
+    Tanque * getTanque(int id);
 	  bool verificaTanquesMortos(int maxX , int maxY);
 	  void incrementaMunicao();
 	  void serializaLista(std::string &buffer_saida);
