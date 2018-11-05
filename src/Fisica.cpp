@@ -69,11 +69,21 @@ void Fisica::update(float deltaT) {
       for(int j = 0; j < b->size(); j++){
           if(distancia((*t)[i]->getPosicao(), (*b)[j]->getPosicao()) < 1.0)
           {
+              // Decrementamos a vida do tanque
+              (*t)[i]->updateVida((*t)[i]->getVida() - 1);
+              //Verificamos se ele morreu para poder atribuir o kill ao atirador
+              if((*t)[i]->getVida() <= 0){
+                  for(int k = 0; k < t->size(); k++){
+                      if((*t)[k]->getId() == (*b)[j]->getIdAtirador()){
+                          (*t)[k]->updateKills((*t)[k]->getKills() + 1);
+                          break;
+                      }
+                  }
+              }
               // Deletamos a bala
               delete this->ldb->removeBala(j);
               j--;
-              // Decrementamos a vida do tanque
-              (*t)[i]->updateVida((*t)[i]->getVida() - 1);
+              
           }
       }
   }
