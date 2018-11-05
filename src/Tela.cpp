@@ -78,8 +78,8 @@ void Tela::update() {
     if((*tanques)[k]->getId() == this->id){
 
       wattron(this->janelaInfoJogador, COLOR_PAIR(this->id +1));
-      mvwprintw(this->janelaInfoJogador , 1, 1, "Meu tanque: Vida: %d/3 | Balas: %d/%d | Mortes: %d", 
-               (*tanques)[k]->getVida() , (*tanques)[k]->getBalaAtual() , (*tanques)[k]->getBalaMax(), (*tanques)[k]->getMortes());
+      mvwprintw(this->janelaInfoJogador , 1, 1, "Meu tanque: Vida: %d/3 | Balas: %d/%d | Kills: %d | Deaths: %d", 
+               (*tanques)[k]->getVida() , (*tanques)[k]->getBalaAtual() , (*tanques)[k]->getBalaMax(), (*tanques)[k]->getKills(), (*tanques)[k]->getDeaths());
 
       wattroff(this->janelaInfoJogador, COLOR_PAIR(this->id +1));
     }
