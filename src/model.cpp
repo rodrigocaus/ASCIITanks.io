@@ -12,7 +12,7 @@ float distancia(Coordenada p, Coordenada q) {
 	return (float) sqrt((p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
 }
 
-Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao, int id, int mortes) {
+Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao, int id, int kills , int deaths) {
   this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
   this->vida = vida;
@@ -21,7 +21,8 @@ Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float ve
   this->direcao = direcao;
   this->velocidadePadrao = velocidadePadrao;
   this->id = id;
-  this->mortes = mortes;
+  this->deaths = deaths;
+  this->kills = kills;
 }
 
 Tanque::Tanque(int maxX , int maxY,  int id) {
@@ -35,7 +36,8 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
   this->direcao = 'd';
   this->velocidadePadrao = 0.025;
   this->id = id;
-  this->mortes = 0;
+  this->deaths = 0;
+  this->kills = 0;
 }
 
   void Tanque::updatePosicao(Coordenada novaPosicao){
@@ -64,8 +66,12 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
     this->vida = novaVida;
   }
 
-  void Tanque::updateMortes(int novaMorte){
-    this->mortes = novaMorte;
+  void Tanque::updateDeaths(int novaDeaths){
+    this->deaths = novaDeaths;
+  }
+
+  void Tanque::updateKills(int novaKills){
+    this->kills = novaKills;
   }
 
   Coordenada Tanque::getVelocidade(){
@@ -100,8 +106,12 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
 	return id;
   }
 
-  int Tanque::getMortes() {
-  return mortes;
+  int Tanque::getDeaths() {
+  return deaths;
+  }
+
+  int Tanque::getKills() {
+  return kills;
   }
 
   //Realiza movimentos e ações do tanque
@@ -148,7 +158,7 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
                     posBala.y += 1.0;
                     break;
               }
-              b = new Bala(this->direcao , posBala);
+              b = new Bala(this->direcao , posBala , this->id);
           }
           break;
         default:
@@ -167,7 +177,7 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
 	  s += std::to_string(this->vida) + "," + std::to_string(this->direcao) + ",";
 	  s += std::to_string(this->balaAtual) + "," + std::to_string(this->balaMax) + ",";
 	  s += std::to_string(this->velocidadePadrao) + "," + std::to_string(this->id) + ",";
-    s += std::to_string(this->mortes) + "\n";
+    s += std::to_string(this->kills) + "," + std::to_string(this->deaths) + "\n";
 
 	  return s;
   }
@@ -176,13 +186,14 @@ Tanque::Tanque(int maxX , int maxY,  int id) {
 	  return out << t.toString();
   }
 
-Bala::Bala(Coordenada velocidade, Coordenada posicao) {
+Bala::Bala(Coordenada velocidade, Coordenada posicao , int idAtirador) {
   this->velocidade = velocidade;
   this->posicao = posicao;
+  this->idAtirador = idAtirador;
 }
 
 //Segunda opção de construtor: Polar (posição e direção ao invés de posição e velocidade)
-Bala::Bala(char direcao, Coordenada posicao , float velocidadePadrao) {
+Bala::Bala(char direcao, Coordenada posicao, int idAtirador, float velocidadePadrao ) {
     switch (direcao) {
         case 'w':
           this->velocidade = {-velocidadePadrao/2 , 0.0};
@@ -199,6 +210,7 @@ Bala::Bala(char direcao, Coordenada posicao , float velocidadePadrao) {
           break;
     }
     this->posicao = posicao;
+    this->idAtirador = idAtirador;
 }
 
   void Bala::updatePosicao(Coordenada novaPosicao){
@@ -213,10 +225,15 @@ Bala::Bala(char direcao, Coordenada posicao , float velocidadePadrao) {
     return posicao;
   }
 
+  int Bala::getIdAtirador(){
+    return idAtirador;
+  }
+
   std::string Bala::toString() const{
 	  std::string s = "";
 	  s += std::to_string((this->velocidade).x) + "," + std::to_string((this->velocidade).y) + ",";
-	  s += std::to_string((this->posicao).x) + "," + std::to_string((this->posicao).y) + "\n";
+	  s += std::to_string((this->posicao).x) + "," + std::to_string((this->posicao).y) + ",";
+    s += std::to_string(this->idAtirador) + "\n";
 	  return s;
   }
 
@@ -237,7 +254,7 @@ ListaDeBalas::~ListaDeBalas() {
     std::vector<Bala *> *balas = ldb->getBalas();
 
     for (int k=0; k<balas->size(); k++) {
-      Bala *b = new Bala((*balas)[k]->getVelocidade(), (*balas)[k]->getPosicao());
+      Bala *b = new Bala((*balas)[k]->getVelocidade(), (*balas)[k]->getPosicao() , (*balas)[k]->getIdAtirador());
       this->addBala(b);
     }
   }
@@ -282,11 +299,12 @@ ListaDeBalas::~ListaDeBalas() {
   void ListaDeBalas::deserializaLista(std::string buffer_entrada) {
 	  Coordenada vel;
 	  Coordenada pos;
+    int idAtirador;
 	  char *s = (char *)buffer_entrada.c_str();
-	  while (sscanf(s, "%f,%f,%f,%f\n", &(vel.x), &(vel.y), &(pos.x), &(pos.y)) > 0) {
+	  while (sscanf(s, "%f,%f,%f,%f,%d\n", &(vel.x), &(vel.y), &(pos.x), &(pos.y), &idAtirador) > 0) {
 		  for (; *s != '\n'; s++);
 		  s++;
-		  Bala *novaBala = new Bala(vel, pos);
+		  Bala *novaBala = new Bala(vel, pos, idAtirador);
 		  this->addBala(novaBala);
 	  }
   }
@@ -314,7 +332,7 @@ ListaDeTanques::~ListaDeTanques() {
 
     for (int k=0; k<tanques->size(); k++) {
       Tanque *t = new Tanque((*tanques)[k]->getPosicao(), (*tanques)[k]->getVida(),(*tanques)[k]->getBalaMax(),
-                             (*tanques)[k]->getDirecao() , (*tanques)[k]->getVelocidadePadrao(), (*tanques)[k]->getId(), (*tanques)[k]->getMortes());
+                             (*tanques)[k]->getDirecao() , (*tanques)[k]->getVelocidadePadrao(), (*tanques)[k]->getId(), (*tanques)[k]->getKills(), (*tanques)[k]->getDeaths());
       this->addTanque(t);
     }
   }
@@ -374,7 +392,7 @@ ListaDeTanques::~ListaDeTanques() {
             (*(this->tanques))[i]->updateVida(3);
             (*(this->tanques))[i]->updateBala(3);
             (*(this->tanques))[i]->updateDirecao('d');
-            (*(this->tanques))[i]->updateMortes((*(this->tanques))[i]->getMortes() + 1);
+            (*(this->tanques))[i]->updateDeaths((*(this->tanques))[i]->getDeaths() + 1);
 
             alguemMorreu = true;
         }
@@ -415,18 +433,20 @@ ListaDeTanques::~ListaDeTanques() {
 	 int balaMax;
 	 float velocidadePadrao;
 	 int id;
-   int mortes;
+   int kills;
+   int deaths;
 	 char *s = (char *)buffer_entrada.c_str();
+
 	 while 	(\
-		 		sscanf(s, "%f,%f,%f,%f,%d,%d,%d,%d,%f,%d,%d\n", \
+		 		sscanf(s, "%f,%f,%f,%f,%d,%d,%d,%d,%f,%d,%d,%d\n", \
 				&(vel.x), &(vel.y), &(pos.x), &(pos.y), \
 				&vida, &direcao, &balaAtual, &balaMax, \
-				&velocidadePadrao, &id, &mortes) \
+				&velocidadePadrao, &id, &kills , &deaths) \
 			> 0)
 	{
 		 for (; *s != '\n'; s++);
 		 s++;
-		 Tanque *novoTanque = new Tanque(pos, vida, balaMax, (char) direcao, velocidadePadrao, id, mortes);
+		 Tanque *novoTanque = new Tanque(pos, vida, balaMax, (char) direcao, velocidadePadrao, id, kills, deaths);
 		 novoTanque->updateVelocidade(vel);
 		 novoTanque->updateBala(balaAtual);
 		 this->addTanque(novoTanque);

@@ -30,14 +30,16 @@ class Bala {
   private:
   Coordenada velocidade;
   Coordenada posicao;
+  int idAtirador;
 
   public:
-  Bala(Coordenada velocidade, Coordenada posicao);
-  Bala(char direcao, Coordenada posicao , float velocidadePadrao = 0.03);
+  Bala(Coordenada velocidade, Coordenada posicao, int idAtirador);
+  Bala(char direcao, Coordenada posicao , int idAtirador, float velocidadePadrao = 0.03);
   void updatePosicao(Coordenada novaPosicao);
 
   Coordenada getVelocidade();
   Coordenada getPosicao();
+  int getIdAtirador();
 
   std::string toString() const;
   friend std::ostream& operator<<(std::ostream& out, const Bala& b);
@@ -53,20 +55,22 @@ class Tanque {
   int balaAtual;
   int balaMax;
   int id;
-  int mortes;
+  int kills;
+  int deaths;
   char direcao;
   float velocidadePadrao;
   
 
   public:
-  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao , int id, int mortes);
+  Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao , int id, int kills, int deaths);
   Tanque(int maxX, int maxY , int id);
   void updatePosicao(Coordenada novaPosicao);
   void updateVelocidade(Coordenada novaVelocidade);
   void updateDirecao(char novaDirecao);
   void updateBala(int novaBalaAtual);
   void updateVida(int novaVida);
-  void updateMortes(int novaMorte);
+  void updateDeaths(int novaDeaths);
+  void updateKills(int novaKills);
 
   Coordenada getVelocidade();
   Coordenada getPosicao();
@@ -76,7 +80,8 @@ class Tanque {
   float getVelocidadePadrao();
   char getDirecao();
   int getId();
-  int getMortes();
+  int getDeaths();
+  int getKills();
 
   Bala *comando(char c);
 
