@@ -25,6 +25,7 @@ void Tela::init(int id) {
   this->id = id;
   this->janelaDeJogo = newwin(this->maxI+1, this->maxJ+1, 0, 0);
   this->janelaInfoJogador = newwin(3, this->maxJ+1 , this->maxI+1, 0);
+  this->janelaRanking = newwin(this->maxI+1, 20 , 0 , this->maxJ+1);
 
   start_color();
   // Cor de fundo da janela como branco e texto em preto
@@ -47,7 +48,9 @@ void Tela::init(int id) {
   //Depois colore a tela com a cor branca
   wbkgd(this->janelaDeJogo, COLOR_PAIR(1));
   wbkgd(this->janelaInfoJogador, COLOR_PAIR(1));
+  wbkgd(this->janelaRanking, COLOR_PAIR(1));
   box(this->janelaInfoJogador, 0, 0);
+  box(this->janelaRanking, 0, 0);
   //E atualiza
   refresh();
 
@@ -55,8 +58,12 @@ void Tela::init(int id) {
 
 void Tela::update() {
   Coordenada pos;
+
   // Apaga todos os corpos da tela
   werase(this->janelaDeJogo);
+  werase(this->janelaRanking);
+  box(this->janelaInfoJogador, 0, 0);
+  box(this->janelaRanking, 0, 0);
 
   // Desenha balas na tela
   std::vector<Bala *> *balas = this->ldb->getBalas();
@@ -78,17 +85,19 @@ void Tela::update() {
     if((*tanques)[k]->getId() == this->id){
 
       wattron(this->janelaInfoJogador, COLOR_PAIR(this->id +1));
-      mvwprintw(this->janelaInfoJogador , 1, 1, "Meu tanque: Vida: %d/3 | Balas: %d/%d | Kills: %d | Deaths: %d", 
-               (*tanques)[k]->getVida() , (*tanques)[k]->getBalaAtual() , (*tanques)[k]->getBalaMax(), (*tanques)[k]->getKills(), (*tanques)[k]->getDeaths());
 
+      mvwprintw(this->janelaInfoJogador , 1, 1, "Meu tanque: Vida: %d/3 | Balas: %d/%d | Kills: %d | Deaths: %d",
+                (*tanques)[k]->getVida() , (*tanques)[k]->getBalaAtual() , (*tanques)[k]->getBalaMax(), (*tanques)[k]->getKills(), (*tanques)[k]->getDeaths());
+              
       wattroff(this->janelaInfoJogador, COLOR_PAIR(this->id +1));
     }
 
     pos = ((*tanques)[k]->getPosicao());
     wmove(this->janelaDeJogo, (int) pos.x, (int) pos.y);   /* Move cursor to position */
 
-    //Colore o tanque
+    //Colore o tanque e o rank dele
     wattron(this->janelaDeJogo, COLOR_PAIR((*tanques)[k]->getId()+1));
+    wattron(this->janelaRanking, COLOR_PAIR((*tanques)[k]->getId()+1));
 
     //Desenha o tanque com setas diferentes dependendo da posição apontada
     char dir = (*tanques)[k]->getDirecao();
@@ -111,13 +120,19 @@ void Tela::update() {
             break;
     }
 
+    mvwprintw(this->janelaRanking , 1+k , 1 , "ID:%d |K:%d |D:%d",
+              (*tanques)[k]->getId() , (*tanques)[k]->getKills(), (*tanques)[k]->getDeaths()); 
+              
     wattroff(this->janelaDeJogo, COLOR_PAIR((*tanques)[k]->getId()+1));
+    wattroff(this->janelaRanking, COLOR_PAIR((*tanques)[k]->getId()+1));
 
   }
 
   // Atualiza tela
   wrefresh(this->janelaDeJogo);
   wrefresh(this->janelaInfoJogador);
+  wrefresh(this->janelaRanking);
+
 }
 
 
@@ -141,9 +156,11 @@ void Tela::fimDeJogo() {
 
 void Tela::stop() {
   delwin(this->janelaDeJogo);
+  delwin(this->janelaInfoJogador);
+  delwin(this->janelaRanking);
   endwin();
 }
 
 Tela::~Tela() {
-  this->stop();;
+  this->stop();
 }
