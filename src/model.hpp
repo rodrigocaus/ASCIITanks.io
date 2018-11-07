@@ -13,6 +13,7 @@
 #include <thread>
 #include <vector>
 #include <random>
+#include <algorithm>
 
 //Tamanho da janela de jogo
 #define MAXX 20
@@ -127,8 +128,12 @@ class ListaDeTanques {
 	  void incrementaMunicao();
 	  void serializaLista(std::string &buffer_saida);
 	  void deserializaLista(std::string buffer_entrada);
+    void ordena();
 	  Tanque *operator[](size_t n);
 	  void operator=(const std::string& ldt_serial);
 };
+
+//Função de comparação de tanques, inicialmente por kills
+bool ordemRanking(Tanque *esquerdo, Tanque *direito);
 
 #endif
