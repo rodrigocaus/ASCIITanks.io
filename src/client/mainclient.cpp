@@ -121,6 +121,9 @@ int main(int argc, char *argv[])
 	ldb->deserializaLista(ldbSerial);
 	ldt->deserializaLista(ldtSerial);
 
+	//Ordena a lista de tanques de acordo com o rank
+	ldt->ordena();
+
 	#ifdef AUDIO_ON
 	if(primeiroLoop){
 		player->init();
