@@ -12,6 +12,10 @@ float distancia(Coordenada p, Coordenada q) {
 	return (float) sqrt((p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
 }
 
+bool ordemRanking(Tanque *esquerdo, Tanque *direito){
+    return (esquerdo->getKills() > direito->getKills());
+}
+
 Tanque::Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao, int id, int kills , int deaths) {
   this->velocidade = {0.0, 0.0};
   this->posicao = posicao;
@@ -383,8 +387,9 @@ ListaDeTanques::~ListaDeTanques() {
   }
 
   void ListaDeTanques::limpaLista() {
-	  for (int i = (this->tanques)->size(); i > 0; i--) {
-	  	this->removeTanque(i - 1);
+	  for (int i = (this->tanques)->size() - 1; i >= 0; i--) {
+	  	  delete (*(this->tanques))[i];
+        (this->tanques)->erase((this->tanques)->begin() + i);
 	  }
   }
   //Verifica tanques que morreram com base na vida. Se 0 ou negativa, morreu, "renasce" em algum lugar do mapa.
@@ -400,7 +405,7 @@ ListaDeTanques::~ListaDeTanques() {
             (*(this->tanques))[i]->updateVelocidade({0.0, 0.0});
             (*(this->tanques))[i]->updateVida(3);
             (*(this->tanques))[i]->updateBala(3);
-            (*(this->tanques))[i]->updateDirecao('d');
+            (*(this->tanques))[i]->updateDirecao('w');
             (*(this->tanques))[i]->updateDeaths((*(this->tanques))[i]->getDeaths() + 1);
 
             alguemMorreu = true;
@@ -460,6 +465,10 @@ ListaDeTanques::~ListaDeTanques() {
 		 novoTanque->updateBala(balaAtual);
 		 this->addTanque(novoTanque);
 	 }
+  }
+
+  void ListaDeTanques::ordena(){
+    std::sort((*tanques).begin(), (*tanques).end(), ordemRanking);
   }
 
   Tanque *ListaDeTanques::operator[](size_t n) {
