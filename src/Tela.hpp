@@ -15,6 +15,7 @@ class Tela {
     int maxI, maxJ, id;
     WINDOW *janelaDeJogo;
     WINDOW *janelaInfoJogador;
+    WINDOW *janelaRanking;
   public:
     Tela(ListaDeTanques *ldt, ListaDeBalas *ldb, int maxI, int maxJ);
     ~Tela();
