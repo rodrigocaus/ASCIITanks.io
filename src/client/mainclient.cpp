@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   }
   
   //Estabelece a conexao com o servidor
-  cliente->conecta(nome, (size_t *) &id);
+  cliente->conecta(nome, &id);
   std::cout << "Conectado com o id " << (int) id << std::endl;
 
   #ifdef AUDIO_ON
