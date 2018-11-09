@@ -60,7 +60,7 @@ class Cliente {
         Cliente();
         ~Cliente();
         int config(const char * endereco_ip);
-        void conecta(std::string &nome_cliente, size_t *id_cliente);
+        void conecta(std::string &nome_cliente, int *id_cliente);
         void stop();
         void receberLista(std::string & buf, size_t tamanho);
         void receberTamanho(size_t * ldbTam , size_t * ldtTam);

@@ -62,19 +62,22 @@ int Servidor::config(const char * endereco_ip) {
 void Servidor::conectaClientes(int n_clientes , std::vector<jogador> & jogadores){
 
 	char nome[21] = {0};
+	size_t tamNome = 0;
 
 	// Recebe uma conexao de cliente
 
 	for (int i = 0; i < n_clientes; i++) {
       jogadores.push_back(jogador());
       jogadores[i].conexao_fd = accept(this->socket_fd, NULL, NULL);
-      recv(jogadores[i].conexao_fd, nome, 20, 0);
+      recv(jogadores[i].conexao_fd, &tamNome, sizeof(size_t), 0);
+      recv(jogadores[i].conexao_fd, nome, tamNome, MSG_WAITALL);
       jogadores[i].nome = nome;
       jogadores[i].id = i;
       jogadores[i].ativo = true;
       send(jogadores[i].conexao_fd, &(jogadores[i].id), sizeof(int), 0);
       std::cout << nome << " se conectou\n";
       std::cout << "Aguardando " << (n_clientes - i - 1) << " jogadores\n";
+      nome[0] = '\0';
   	}
   	std::cout << "Iniciando Partida\n";
 }
@@ -136,7 +139,7 @@ int Cliente::config(const char * endereco_ip) {
 
 }
 
-void Cliente::conecta(std::string &nome_cliente, size_t *id_cliente) {
+void Cliente::conecta(std::string &nome_cliente, int * id_cliente) {
 
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
@@ -145,8 +148,11 @@ void Cliente::conecta(std::string &nome_cliente, size_t *id_cliente) {
     } else {
 		char nome[21] = {0};
 		strncpy(nome, nome_cliente.c_str(), nome_cliente.length());
+		size_t tamNome = strlen(nome);
+		tamNome++;
+		send(socket_fd, &tamNome, sizeof(size_t) , 0);
     	send(socket_fd, nome, 20, 0);
-		recv(socket_fd, id_cliente, sizeof(size_t), 0);
+		recv(socket_fd, id_cliente, sizeof(int), 0);
 		std::cout << "Conectado ao servidor\n";
     }
 }
