@@ -81,8 +81,8 @@ int main (int argc, char *argv[])
   int periodo = 0;
 
   //String que receberá a serialização das listas de balas e tanques
-  std::string ldbSerial;
-  std::string ldtSerial;
+  std::string ldbSerial = "";
+  std::string ldtSerial = "";
 
   //Inicializa a thread que assincronamente recebe os comandos dos clientes
   servidor->initReceberComando(&jogadores, &deletar);
