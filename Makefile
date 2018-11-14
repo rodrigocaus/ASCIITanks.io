@@ -14,7 +14,7 @@ SERVER = server.ea
 
 FLAGS = -std=c++11 -lncurses -lpthread -lportaudio
 
-IP=127.0.0.1
+IP=
 
 all: $(GAME)
 
