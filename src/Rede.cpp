@@ -9,7 +9,7 @@
 void funcRecebeComandos(std::vector<jogador> * jogadores, bool *deletar)
 {
   while (jogadores->size() > 0) {
-      for(size_t i = 0; !(*deletar) && i < jogadores->size() ; i++){
+      for(uint32_t i = 0; !(*deletar) && i < jogadores->size() ; i++){
        	recv((*jogadores)[i].conexao_fd, &((*jogadores)[i].comando) , 1 , MSG_DONTWAIT);
         if((*jogadores)[i].comando == 'q'){
         	(*jogadores)[i].ativo = false;
@@ -62,19 +62,19 @@ int Servidor::config(const char * endereco_ip) {
 void Servidor::conectaClientes(int n_clientes , std::vector<jogador> & jogadores){
 
 	char nome[21] = {0};
-	size_t tamNome = 0;
+	uint32_t tamNome = 0;
 
 	// Recebe uma conexao de cliente
 
 	for (int i = 0; i < n_clientes; i++) {
       jogadores.push_back(jogador());
       jogadores[i].conexao_fd = accept(this->socket_fd, NULL, NULL);
-      recv(jogadores[i].conexao_fd, &tamNome, sizeof(size_t), 0);
+      recv(jogadores[i].conexao_fd, &tamNome, sizeof(uint32_t), 0);
       recv(jogadores[i].conexao_fd, nome, tamNome, MSG_WAITALL);
       jogadores[i].nome = nome;
       jogadores[i].id = i;
       jogadores[i].ativo = true;
-      send(jogadores[i].conexao_fd, &(jogadores[i].id), sizeof(int), 0);
+      send(jogadores[i].conexao_fd, &(jogadores[i].id), sizeof(uint32_t), 0);
       std::cout << nome << " se conectou\n";
       std::cout << "Aguardando " << (n_clientes - i - 1) << " jogadores\n";
       nome[0] = '\0';
@@ -85,7 +85,7 @@ void Servidor::conectaClientes(int n_clientes , std::vector<jogador> & jogadores
 void Servidor::transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores)
 {
 	if(sEnvio.length() > 0){
-		for (size_t i = 0; i < jogadores.size(); i++) {
+		for (uint32_t i = 0; i < jogadores.size(); i++) {
 			//Enviando estado de jogo serializado
 		    if (jogadores[i].ativo && send(jogadores[i].conexao_fd, (void *)sEnvio.c_str() , sEnvio.length() , 0) < 0) {
 		      std::cerr << "Erro ao enviar mensagem das listas\n";
@@ -96,11 +96,11 @@ void Servidor::transmitirLista(std::string & sEnvio , std::vector<jogador> & jog
 	}
 }
 
-void Servidor::transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores)
+void Servidor::transmitirTamanho(uint32_t * tamListas , std::vector<jogador> & jogadores)
 {
 	//Enviando o tamanho das listas
-	for (size_t i = 0; i < jogadores.size(); i++) {
-		if (jogadores[i].ativo && send(jogadores[i].conexao_fd, (void *)tamListas , 2*sizeof(size_t) , 0) < 0) {
+	for (uint32_t i = 0; i < jogadores.size(); i++) {
+		if (jogadores[i].ativo && send(jogadores[i].conexao_fd, (void *)tamListas , 2*sizeof(uint32_t) , 0) < 0) {
 	      std::cerr << "Erro ao enviar mensagem de tamanhos\n";
 	    } else {
 	      //std::cerr << "Tamanho enviado\n";
@@ -139,7 +139,7 @@ int Cliente::config(const char * endereco_ip) {
 
 }
 
-void Cliente::conecta(std::string &nome_cliente, int * id_cliente) {
+void Cliente::conecta(std::string &nome_cliente, uint32_t * id_cliente) {
 
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
@@ -149,16 +149,16 @@ void Cliente::conecta(std::string &nome_cliente, int * id_cliente) {
     } else {
 		char nome[21] = {0};
 		strncpy(nome, nome_cliente.c_str(), nome_cliente.length());
-		size_t tamNome = strlen(nome);
+		uint32_t tamNome = strlen(nome);
 		tamNome++;
-		send(socket_fd, &tamNome, sizeof(size_t) , 0);
+		send(socket_fd, &tamNome, sizeof(uint32_t) , 0);
     	send(socket_fd, nome, 20, 0);
-		recv(socket_fd, id_cliente, sizeof(int), 0);
+		recv(socket_fd, id_cliente, sizeof(uint32_t), 0);
 		std::cout << "Conectado ao servidor\n";
     }
 }
 
-void Cliente::receberLista(std::string & buf, size_t tamanho)
+void Cliente::receberLista(std::string & buf, uint32_t tamanho)
 {
 	if(tamanho > 0){
 
@@ -174,12 +174,12 @@ void Cliente::receberLista(std::string & buf, size_t tamanho)
 	}
 }
 
-void Cliente::receberTamanho(size_t * ldbTam , size_t * ldtTam)
+void Cliente::receberTamanho(uint32_t * ldbTam , uint32_t * ldtTam)
 {
 
-	size_t tamListas[2] = {0,0};
+	uint32_t tamListas[2] = {0,0};
 	//Recebe o tamanho das listas serializadas
-	if((recv(socket_fd, (void*)tamListas, 2*sizeof(size_t), MSG_WAITALL))>0){
+	if((recv(socket_fd, (void*)tamListas, 2*sizeof(uint32_t), MSG_WAITALL))>0){
 		//std::cerr << "Recebi tamanho com sucesso\n";
 	} else {
 		std::cerr << "Erro ao receber tamanho\n";

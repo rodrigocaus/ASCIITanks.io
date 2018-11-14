@@ -42,10 +42,10 @@ class Servidor {
         Servidor();
         ~Servidor();
         int config(const char * endereco_ip);
-        void conectaClientes(int id_cliente , std::vector<jogador> & jogadores);
+        void conectaClientes(int n_clientes , std::vector<jogador> & jogadores);
         void stop();
         void transmitirLista(std::string & sEnvio , std::vector<jogador> & jogadores);
-        void transmitirTamanho(size_t * tamListas , std::vector<jogador> & jogadores);
+        void transmitirTamanho(uint32_t * tamListas , std::vector<jogador> & jogadores);
         void initReceberComando(std::vector<jogador> * jogadores, bool *deletar);
 };
 
@@ -60,10 +60,10 @@ class Cliente {
         Cliente();
         ~Cliente();
         int config(const char * endereco_ip);
-        void conecta(std::string &nome_cliente, int *id_cliente);
+        void conecta(std::string &nome_cliente, uint32_t *id_cliente);
         void stop();
-        void receberLista(std::string & buf, size_t tamanho);
-        void receberTamanho(size_t * ldbTam , size_t * ldtTam);
+        void receberLista(std::string & buf, uint32_t tamanho);
+        void receberTamanho(uint32_t * ldbTam , uint32_t * ldtTam);
         int enviarComando(char c);
 };
 

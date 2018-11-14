@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
     servidor->config(argv[1]);
   }
   std::cout << "Aguardando conexao dos clientes ..." << std::endl;
- 
+
   //Conecta os clientes, construindo as structs jogadores com informações de nome e id
   servidor->conectaClientes(n_clientes , jogadores);
 
@@ -94,7 +94,7 @@ int main (int argc, char *argv[])
     t0 = t1;
     t1 = get_now_ms();
     deltaT = t1-t0;
-    
+
     // Atualiza modelo
     f->update(deltaT);
 
@@ -106,7 +106,7 @@ int main (int argc, char *argv[])
     ldt->serializaLista(ldtSerial);
 
     //Tamanho das listas geradasw
-    size_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
+    uint32_t tamListas[2] = {ldbSerial.size(),ldtSerial.size()};
 
     //Envia os tamanhos das listas para os clientes saberem o quanto deve receber
     servidor->transmitirTamanho(tamListas , jogadores);

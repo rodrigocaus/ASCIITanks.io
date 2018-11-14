@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
   //Obtendo e validando o nome do jogador
   std::string nome;
-  int id;
+  uint32_t id;
   do {
 	  std::cout << "Digite um nome com até 20 caracteres: ";
 	  std::cin >> nome;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   } else {
     cliente->config(argv[1]);
   }
-  
+
   //Estabelece a conexao com o servidor
   cliente->conecta(nome, &id);
   std::cout << "Conectado com o id " << (int) id << std::endl;
@@ -65,11 +65,11 @@ int main(int argc, char *argv[])
   somBoom->load("assets/boom.dat");
   Audio::Sample *somHit = new Audio::Sample();
   somHit->load("assets/hit.dat");
-  
+
   //Cria o objeto de tocador de audio
   Audio::Player *player = new Audio::Player();
   #endif
- 
+
   //Cria as listas de balas e tanques
   ListaDeBalas *ldb = new ListaDeBalas();
   ListaDeTanques *ldt = new ListaDeTanques();
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   teclado->getChar();
 
   //Tamanhos das listas a serem desserializadas
-  size_t ldbTam , ldtTam;
+  uint32_t ldbTam , ldtTam;
 
   //Strings das listas serializadas
   std::string ldbSerial , ldtSerial;
@@ -179,7 +179,7 @@ tela->stop();
 teclado->stop();
 std::cout << "Fim de jogo\n";
 
-#ifdef AUDIO_ON 
+#ifdef AUDIO_ON
 player->stop();
 #endif
 
