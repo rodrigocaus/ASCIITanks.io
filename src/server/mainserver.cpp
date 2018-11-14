@@ -8,7 +8,7 @@
 #include "../Rede.hpp"
 #include "../Cor.hpp"
 
-#define MAX_JOGADORES 4
+#define MAX_JOGADORES 7
 
 //Pega o tempo em milisegundos
 using namespace std::chrono;
