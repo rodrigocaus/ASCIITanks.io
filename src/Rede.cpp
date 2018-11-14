@@ -10,7 +10,7 @@ void funcRecebeComandos(std::vector<jogador> * jogadores, bool *deletar)
 {
   while (jogadores->size() > 0) {
       for(size_t i = 0; !(*deletar) && i < jogadores->size() ; i++){
-       	recv((*jogadores)[i].conexao_fd, &((*jogadores)[i].comando) , 1 , MSG_DONTWAIT); 
+       	recv((*jogadores)[i].conexao_fd, &((*jogadores)[i].comando) , 1 , MSG_DONTWAIT);
         if((*jogadores)[i].comando == 'q'){
         	(*jogadores)[i].ativo = false;
         	*deletar = true;
@@ -143,7 +143,7 @@ void Cliente::conecta(std::string &nome_cliente, int * id_cliente) {
 
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
-    	std::cout << "Erro em conectar com o servidor\n";
+    	std::cerr << "Erro em conectar com o servidor\n";
     	exit(0);
     } else {
 		char nome[21] = {0};
