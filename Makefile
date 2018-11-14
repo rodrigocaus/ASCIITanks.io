@@ -14,6 +14,7 @@ SERVER = server.ea
 
 FLAGS = -std=c++11 -lncurses -lpthread -lportaudio
 
+IP=127.0.0.1
 
 all: $(GAME)
 
@@ -24,16 +25,16 @@ $(GAME_MUDO): $(CLIENT_MUDO_HPP) $(CLIENT_MUDO_SRC) $(CLIENT_MAIN)
 	g++ $(CLIENT_MUDO_SRC) $(CLIENT_MAIN) -o $(GAME_MUDO) $(FLAGS) -UAUDIO_ON
 
 play_mudo: $(GAME_MUDO)
-	./$(GAME_MUDO) 127.0.0.1 2>gameMudo.log
+	./$(GAME_MUDO) $(IP) 2>gameMudo.log
 
 play: $(GAME)
-	./$(GAME) 127.0.0.1 2>game.log
+	./$(GAME) $(IP) 2>game.log
 
 $(SERVER): $(SERVER_HPP) $(SERVER_SRC) $(SERVER_MAIN)
 	g++ $(SERVER_SRC) $(SERVER_MAIN) -o $(SERVER) $(FLAGS)
 
 server: $(SERVER)
-	./$(SERVER) 127.0.0.1 2>server.log
+	./$(SERVER) $(IP) 2>server.log
 
 clear:
 	rm -f $(GAME) $(GAME_MUDO) $(SERVER) game.log gameMudo.log server.log
