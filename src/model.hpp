@@ -16,7 +16,7 @@
 #include <algorithm>
 
 //Tamanho da janela de jogo
-#define MAXX 20
+#define MAXX 30
 #define MAXY 60
 
 
@@ -60,7 +60,7 @@ class Tanque {
   int deaths;
   char direcao;
   float velocidadePadrao;
-  
+
 
   public:
   Tanque(Coordenada posicao, int vida, int balaMax, char direcao, float velocidadePadrao , int id, int kills, int deaths);
