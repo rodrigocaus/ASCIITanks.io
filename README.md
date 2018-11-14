@@ -1,6 +1,6 @@
 # ASCIITanks.io
 Jogo multi-player de tanques produzido na disciplina de EA872.
-Neste jogo o objetivo é sobreviver ao ataque dos tanques que surgem na tela.
+Neste jogo o objetivo é ter maior score que os tanques inimigos.
 Será que você consegue?
 
 <img src="doc/ASCIITanks.gif" width="400" height="300"/>
@@ -15,6 +15,7 @@ Será que você consegue?
 ## Instruções
 
 - Execute o programa em um terminal Linux com `make play`
+- Certifique-se que o endereço de IP conectado é o mesmo do servidor.
 - Movimente-se com `w`, `a`, `s` ou `d`
 - Atire com `space`
 - Divirta-se `:)`
