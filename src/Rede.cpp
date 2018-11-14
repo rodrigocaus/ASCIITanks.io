@@ -143,6 +143,7 @@ void Cliente::conecta(std::string &nome_cliente, int * id_cliente) {
 
 	//Estabelece a conexão
 	if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
+        std::cout << "Erro em conectar com o servidor\n";
     	std::cerr << "Erro em conectar com o servidor\n";
     	exit(0);
     } else {
